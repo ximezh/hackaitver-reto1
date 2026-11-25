@@ -1,8 +1,3 @@
-# --- Asistente local (no se versiona) ---
-CLAUDE.md
-!docs/CLAUDE.md
-.claude/
-
 # --- Entorno y secretos ---
 .env
 .env.*
