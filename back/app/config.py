@@ -8,6 +8,14 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 BACK_DIR = Path(__file__).resolve().parent.parent
 
 
+def usar_psycopg(url: str) -> str:
+    """Los servicios administrados entregan `postgres://` o `postgresql://`; se usa psycopg 3."""
+    for prefix in ("postgres://", "postgresql://"):
+        if url.startswith(prefix):
+            return "postgresql+psycopg://" + url.removeprefix(prefix)
+    return url
+
+
 class Settings(BaseSettings):
     """Configuración leída de variables de entorno o de `back/.env`.
 
@@ -23,11 +31,7 @@ class Settings(BaseSettings):
     @field_validator("database_url")
     @classmethod
     def use_psycopg(cls, value: str) -> str:
-        # Los servicios administrados entregan `postgres://` o `postgresql://`.
-        for prefix in ("postgres://", "postgresql://"):
-            if value.startswith(prefix):
-                return "postgresql+psycopg://" + value.removeprefix(prefix)
-        return value
+        return usar_psycopg(value)
 
 
 @lru_cache
