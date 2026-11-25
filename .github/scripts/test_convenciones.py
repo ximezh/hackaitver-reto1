@@ -21,6 +21,8 @@ class Dueno(unittest.TestCase):
         self.assertEqual(dueno("front/vite.config.js"), "devops")
         self.assertEqual(dueno("back/app/main.py"), "back")
         self.assertEqual(dueno("back/Dockerfile"), "devops")
+        self.assertEqual(dueno("back/.dockerignore"), "devops")
+        self.assertEqual(dueno("front/nginx.conf.template"), "devops")
         self.assertEqual(dueno("compose.yaml"), "back")
         self.assertEqual(dueno("docs/api/sprint-1.md"), "back")
         self.assertEqual(dueno("docs/scrum/front.md"), "front")

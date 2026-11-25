@@ -64,6 +64,8 @@ jobs:
         run: npm test
       - name: Build
         run: npm run build
+      - name: Imagen de contenedor
+        run: docker build -t reto1-front:ci .
 
   back:
     name: Back · Ruff y pytest
@@ -106,6 +108,8 @@ jobs:
         run: uv run ruff format --check .
       - name: Pruebas
         run: uv run pytest
+      - name: Imagen de contenedor
+        run: docker build -t reto1-back:ci .
 
   ci:
     name: ci
