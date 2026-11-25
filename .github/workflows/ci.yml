@@ -1,0 +1,124 @@
+# Integración continua de front y back.
+# Cada parte corre solo si cambió algo en su carpeta. El job `ci` siempre corre y resume
+# el resultado: es el único check que se marca como obligatorio en `dev` y `main`.
+name: CI
+
+on:
+  pull_request:
+    branches: [dev, main]
+  push:
+    branches: [dev, main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  cambios:
+    name: Detectar cambios
+    runs-on: ubuntu-latest
+    outputs:
+      front: ${{ steps.filtro.outputs.front }}
+      back: ${{ steps.filtro.outputs.back }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filtro
+        with:
+          filters: |
+            front:
+              - 'front/**'
+              - '.github/workflows/ci.yml'
+            back:
+              - 'back/**'
+              - '.github/workflows/ci.yml'
+
+  front:
+    name: Front · lint, pruebas y build
+    needs: cambios
+    if: needs.cambios.outputs.front == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: front
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: front/package-lock.json
+      - run: npm ci
+      # Sin --fix: en CI el lint solo revisa, no corrige.
+      - name: Oxlint
+        run: npx oxlint .
+      - name: ESLint
+        run: npx eslint .
+      - name: Prettier
+        run: npx prettier --check src/
+      - name: Pruebas
+        run: npm test
+      - name: Build
+        run: npm run build
+
+  back:
+    name: Back · Ruff y pytest
+    needs: cambios
+    if: needs.cambios.outputs.back == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: back
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: reto1
+          POSTGRES_PASSWORD: reto1
+          POSTGRES_DB: reto1
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U reto1 -d reto1"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 20
+    env:
+      APP_ENV: test
+      DATABASE_URL: postgresql://reto1:reto1@localhost:5432/reto1
+      TEST_DATABASE_URL: postgresql://reto1:reto1@localhost:5432/reto1_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: back/uv.lock
+      - name: Crear la base de pruebas
+        run: psql postgresql://reto1:reto1@localhost:5432/reto1 -c "CREATE DATABASE reto1_test"
+      - run: uv sync --locked
+      - name: Ruff
+        run: uv run ruff check .
+      - name: Formato
+        run: uv run ruff format --check .
+      - name: Pruebas
+        run: uv run pytest
+
+  ci:
+    name: ci
+    needs: [cambios, front, back]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Resumen
+        run: |
+          echo "front: ${{ needs.front.result }} · back: ${{ needs.back.result }}"
+          for resultado in "${{ needs.cambios.result }}" "${{ needs.front.result }}" "${{ needs.back.result }}"; do
+            if [ "$resultado" != "success" ] && [ "$resultado" != "skipped" ]; then
+              echo "Un job falló o se canceló: $resultado"
+              exit 1
+            fi
+          done
