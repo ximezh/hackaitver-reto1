@@ -181,7 +181,7 @@ Como equipo queremos detectar en CI si una pantalla se aleja del prototipo.
 
 | Sprint | Estado | PR |
 |---|---|---|
-| 0 | Pendiente | — |
+| 0 | Hecho: DO-01…06 | `devops-ci/sprint0` |
 | 1 | Pendiente | — |
 | 2 | Pendiente | — |
 | 3 | Pendiente | — |
