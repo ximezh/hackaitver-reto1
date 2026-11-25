@@ -1,0 +1,82 @@
+<!-- @dsCard group="CEDIS · Android" height=860 subtitle="Carga del tortón y relación de embarque" -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Supervisor de embarque</title>
+<style>
+.truck{margin:0 16px;padding:14px 14px 12px}
+.trk{display:flex;align-items:stretch;gap:6px}
+.cab{width:54px;border-radius:14px 6px 6px 14px;background:var(--ink);display:flex;flex-direction:column;justify-content:center;align-items:center;color:#fff;gap:4px;font-size:10px;font-weight:600}
+.box{flex:1;border:2px solid var(--ink);border-radius:8px;padding:6px;display:grid;grid-template-columns:repeat(6,1fr);grid-template-rows:1fr 1fr;gap:5px;height:104px;background:repeating-linear-gradient(90deg,#fff 0 8px,#f7f9fd 8px 9px)}
+.slot{border:1.5px dashed #c3cee3;border-radius:6px;display:grid;place-items:center;font-size:9px;font-weight:700;color:var(--ink-muted);transition:.3s}
+.slot.on{border:0;background:var(--brand-600);color:#fff;animation:pop .35s}
+.slot.on.ok{background:var(--success)}
+.wheels{display:flex;justify-content:space-between;padding:0 14px 0 70px;margin-top:-4px}
+.wheels i{width:20px;height:20px;border-radius:50%;background:var(--ink);border:4px solid #c7d1e3;display:block}
+.gauges{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.g .row{justify-content:space-between}
+.g b{font-size:15px}
+.g .bar{position:relative;margin-top:6px;overflow:visible}
+.g .bar:after{content:"";position:absolute;left:90%;top:-4px;bottom:-4px;width:2px;background:var(--ink);border-radius:2px}
+.rule{margin:12px 16px 0;padding:10px 12px;display:flex;gap:10px;align-items:center;border-radius:14px}
+.tl{margin:12px 16px 110px}
+.tr{display:flex;gap:12px;align-items:center;padding:10px 12px}
+.tr .pl{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;flex:none;background:var(--surface-50);color:var(--ink-muted);border:1px solid var(--line)}
+.tr.ok .pl{background:var(--success-50);color:var(--success);border-color:transparent}
+.tr.in .pl{background:var(--brand-50);color:var(--brand-700);border-color:transparent}
+.dock{position:absolute;left:0;right:0;bottom:78px;padding:10px 16px;background:linear-gradient(180deg,rgba(245,248,253,0),var(--surface-50) 35%);display:flex;gap:10px}
+.doc{border:1px solid var(--line);border-radius:14px;padding:14px;background:#fff;position:relative;margin-bottom:12px}
+.doc table{width:100%;font-size:11px;border-collapse:collapse;margin-top:8px}
+.doc td{padding:3px 0;border-bottom:1px solid var(--line)}
+</style></head>
+<body>
+<div class="stage"><div class="phone"><div class="screen" id="scr">
+  <div id="sb"></div>
+  <div class="appbar"><button class="iconbtn" id="back" aria-label="Regresar"></button><div class="grow"><div class="t-cap">Andén E1 · TOR-551-V</div><h1 style="font-size:18px">EMB-0412</h1></div><span class="chip" id="dest"></span></div>
+  <div class="scroll">
+    <div class="card truck">
+      <div class="trk"><div class="box" id="slots"></div><div class="cab" id="cab"></div></div>
+      <div class="wheels"><i></i><i></i><i></i></div>
+      <div class="gauges"><div class="g"><div class="row"><span class="t-cap">Peso</span><b id="pk"></b></div><div class="bar"><i id="bk"></i></div></div><div class="g"><div class="row"><span class="t-cap">Volumen</span><b id="pv"></b></div><div class="bar"><i id="bv"></i></div></div></div>
+    </div>
+    <div class="rule" id="rule"></div>
+    <div class="t-over" style="padding:16px 16px 0">Tarimas para Suc. 07</div>
+    <div class="card tl list" id="tl"></div>
+  </div>
+  <div class="dock"><button class="btn line" id="sc" style="flex:1"></button><button class="btn primary" id="rel" style="flex:1.3"></button></div>
+  <nav class="tabbar" id="tabs"></nav>
+  <div class="sheet" id="sh"><div class="body" id="shb"></div></div>
+</div></div></div>
+<script>
+(function(){
+  var C=window.Cedis,$=function(i){return document.getElementById(i)};
+  $('sb').innerHTML=C.statusBar(); $('back').innerHTML=C.ic('left'); $('dest').innerHTML=C.ic('store',14,2)+'Suc. 07';
+  $('cab').innerHTML=C.ic('truck',22)+'Tortón'; $('sc').innerHTML=C.ic('scan',20)+'Verificar';
+  var CAPK=11000, CAPV=12*1.12*1.15*1.85;
+  var kgs=[910,875,820,940,760,890,905,840,780,930,865,840], T=kgs.map(function(k,i){return {id:'T-07-'+('0'+(i+1)).slice(-2),kg:k,m3:2.05+((i*37)%20)/100,st:i<7?'ok':i<9?'in':'pend'}});
+  function tot(){var k=0,v=0;T.forEach(function(t){if(t.st!=='pend'){k+=t.kg;v+=t.m3}});return {k:k,v:v};}
+  function draw(){ var t=tot(), pk=t.k/CAPK, pv=t.v/CAPV, ready=pk>=.9&&pv>=.9;
+    $('slots').innerHTML=T.map(function(x,i){return '<div class="slot '+(x.st!=='pend'?'on ':'')+(x.st==='ok'?'ok':'')+'">'+(x.st!=='pend'?x.id.slice(-2):i+1)+'</div>'}).join('');
+    $('pk').textContent=Math.round(pk*100)+'%'; $('pv').textContent=Math.round(pv*100)+'%';
+    $('bk').style.width=Math.min(100,pk*100)+'%'; $('bv').style.width=Math.min(100,pv*100)+'%';
+    $('bk').parentNode.className='bar'+(pk>=.9?' ok':''); $('bv').parentNode.className='bar'+(pv>=.9?' ok':'');
+    $('rule').className='rule '+(ready?'chip ok':'chip warn'); $('rule').style.height='auto';
+    $('rule').innerHTML=C.ic(ready?'check':'alert',20,2.2)+'<span style="white-space:normal">'+(ready?'Listo para salir · peso y volumen ≥ 90%':'Sale al 90% · faltan '+C.kg(Math.max(0,CAPK*.9-t.k)).replace(' kg','')+' kg')+'</span>';
+    $('tl').innerHTML=T.map(function(x){var lab=x.st==='ok'?'<span class="chip ok">Verificada</span>':x.st==='in'?'<span class="chip">Cargada</span>':'<span class="chip mute">En rack</span>';
+      return '<div class="tr '+x.st+'"><span class="pl">'+C.ic(x.st==='ok'?'check':'pallet',22,x.st==='ok'?2.4:1.8)+'</span><div class="grow"><div class="t-data">'+x.id+'</div><div class="t-cap">'+C.kg(x.kg)+' · '+x.m3.toFixed(2)+' m³</div></div>'+lab+'</div>'}).join('');
+    $('rel').disabled=!ready; $('rel').innerHTML=C.ic('printer',20)+'Relación';
+  }
+  $('sc').onclick=function(){ var x=T.filter(function(t){return t.st!=='ok'})[0]; if(!x){C.toast($('scr'),'Todas verificadas','check');return;}
+    x.st='ok'; draw(); C.toast($('scr'),x.id+' coincide con lo almacenado','check'); };
+  $('rel').onclick=function(){ var t=tot();
+    $('shb').innerHTML='<div class="grab"></div><div class="doc"><div class="row"><div class="grow"><div class="t-over">Relación de embarque</div><div class="t-sub">EMB-0412</div><div class="t-cap">Suc. 07 Boca del Río · TOR-551-V</div></div>'+C.qr('EMB-0412',74)+'</div><table>'+T.filter(function(x){return x.st!=='pend'}).slice(0,4).map(function(x){return '<tr><td>'+x.id+'</td><td style="text-align:right">'+C.kg(x.kg)+'</td></tr>'}).join('')+'<tr><td class="t-cap">… '+T.filter(function(x){return x.st!=='pend'}).length+' tarimas</td><td style="text-align:right;font-weight:700">'+C.kg(t.k)+'</td></tr></table></div>'+
+      '<div class="row" style="gap:10px"><button class="btn line" style="flex:1" id="pdf">'+C.ic('download',18)+'PDF</button><button class="btn primary" style="flex:1" id="pr">'+C.ic('printer',18)+'Imprimir</button></div>';
+    $('sh').classList.add('open'); $('pdf').onclick=function(){C.toast($('scr'),'EMB-0412.pdf guardado','download')}; $('pr').onclick=function(){$('sh').classList.remove('open');C.toast($('scr'),'Enviado a impresora láser','printer')}; };
+  $('sh').onclick=function(e){if(e.target===this)this.classList.remove('open')};
+  /* cargar las tarimas restantes con el mismo botón de verificar */
+  $('slots').onclick=function(){var x=T.filter(function(t){return t.st==='pend'})[0];if(x){x.st='in';draw();}};
+  $('tabs').innerHTML=[['home','Inicio'],['truck','Embarques',1],['pallet','Tarimas'],['history','Historial']].map(function(t){return '<button class="'+(t[2]?'on':'')+'"><span class="pill">'+C.ic(t[0],20)+'</span>'+t[1]+'</button>'}).join('');
+  draw();
+})();
+</script>
+</body>
+</html>
