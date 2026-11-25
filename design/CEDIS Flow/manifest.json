@@ -1,0 +1,254 @@
+{
+  "manifestVersion": 3,
+  "name": "CEDIS Flow",
+  "namespace": "Cedis",
+  "files": [
+    "assets/Ilustraciones/README.md",
+    "components/Bulto/README.md",
+    "components/Caseta/README.md",
+    "components/Desembarque/README.md",
+    "components/Elementos/README.md",
+    "components/Embarque/README.md",
+    "components/Flujo/README.md",
+    "components/LoginMovil/README.md",
+    "components/LoginWeb/README.md",
+    "components/Oficina/README.md",
+    "components/Proveedor/README.md",
+    "components/Sucursal/README.md",
+    "components/Tarima3D/README.md",
+    "components/bundle.css",
+    "components/bundle.js",
+    "tokens.css"
+  ],
+  "libraries": [],
+  "components": [
+    {
+      "name": "Bulto",
+      "group": "CEDIS · Android",
+      "summary": "Detalle visual de un bulto: primero la imagen, luego su contenido; «Ver más» abre el desglose completo y la etiqueta QR."
+    },
+    {
+      "name": "Caseta",
+      "group": "CEDIS · Android",
+      "summary": "Caseta: andenes ocupados de un vistazo, citas del día y registro de entrada y salida de camiones."
+    },
+    {
+      "name": "Desembarque",
+      "group": "CEDIS · Android",
+      "summary": "Supervisor de desembarque: escanea cada bulto contra la OC y ve al momento lo recibido, lo faltante y lo rechazado."
+    },
+    {
+      "name": "Elementos",
+      "group": "Fundamentos",
+      "summary": "Piezas base: botones, chips de estado, campos, segmentado, barras de avance y los colores de la tarima."
+    },
+    {
+      "name": "Embarque",
+      "group": "CEDIS · Android",
+      "summary": "Supervisor de embarque: verifica que las tarimas almacenadas sean las que salen, llena el tortón y genera la Relación de Embarque."
+    },
+    {
+      "name": "Flujo",
+      "group": "Fundamentos",
+      "summary": "Mapa interactivo del proceso Sucursal → CEDIS → Proveedor y de vuelta, con la pantalla que cubre cada paso."
+    },
+    {
+      "name": "LoginMovil",
+      "group": "Acceso",
+      "summary": "Inicio de sesión Android para el CEDIS; detecta el rol por el usuario y abre solo sus módulos."
+    },
+    {
+      "name": "LoginWeb",
+      "group": "Acceso",
+      "summary": "Inicio de sesión web para Sucursal, Proveedor y Oficina, con la ilustración del rol elegido."
+    },
+    {
+      "name": "Oficina",
+      "group": "Web",
+      "summary": "Oficina: CRUD de productos, proveedores, sucursales y usuarios, con indicadores del día y ocupación de los 32 racks."
+    },
+    {
+      "name": "Proveedor",
+      "group": "Web",
+      "summary": "Portal web del proveedor: agenda la cita por andén, captura la factura desglosada por bulto, descarga etiquetas QR y consulta su historial."
+    },
+    {
+      "name": "Sucursal",
+      "group": "Web",
+      "summary": "Portal web de sucursal: pide por bultos con imágenes, sigue cada pedido paso a paso y recibe con el QR de la relación."
+    },
+    {
+      "name": "Tarima3D",
+      "group": "CEDIS · Android",
+      "summary": "Tarima virtual en 3D que se gira con el dedo y acomoda los bultos por peso en tres cajas: roja abajo, naranja en medio, verde arriba."
+    }
+  ],
+  "assetGroups": [
+    {
+      "name": "Ilustraciones",
+      "order": [
+        "bulto.svg",
+        "hojas.svg",
+        "lapices.svg",
+        "clips.svg",
+        "cedis.svg",
+        "sucursal.svg",
+        "anden.svg",
+        "caseta.svg",
+        "recibo.svg",
+        "embarque.svg",
+        "agenda.svg",
+        "impresora.svg",
+        "datos.svg",
+        "login.svg"
+      ],
+      "files": [
+        {
+          "path": "assets/Ilustraciones/bulto.svg",
+          "id": "22703e1a591f4d8613c14c97e2fab84d"
+        },
+        {
+          "path": "assets/Ilustraciones/hojas.svg",
+          "id": "bb5b5c1dab8bf934ec20d84573c4ea05"
+        },
+        {
+          "path": "assets/Ilustraciones/lapices.svg",
+          "id": "e834e115ade1dd4cb88bf71dafbd0f37"
+        },
+        {
+          "path": "assets/Ilustraciones/clips.svg",
+          "id": "e79bb8a39aa82cb2ff3266fd81c4f26b"
+        },
+        {
+          "path": "assets/Ilustraciones/cedis.svg",
+          "id": "75e6c57a6febfeeef315832cf1127da2"
+        },
+        {
+          "path": "assets/Ilustraciones/sucursal.svg",
+          "id": "b911d12139262f070fd6e7f4bfc1e5a7"
+        },
+        {
+          "path": "assets/Ilustraciones/anden.svg",
+          "id": "7502df155cf627f909f784ee6875b86f"
+        },
+        {
+          "path": "assets/Ilustraciones/caseta.svg",
+          "id": "efe80427e454dde90c4f9f961ec5b02d"
+        },
+        {
+          "path": "assets/Ilustraciones/recibo.svg",
+          "id": "bf5e635937aa2b3cc29207bb07a729ba"
+        },
+        {
+          "path": "assets/Ilustraciones/embarque.svg",
+          "id": "983f425ecb85aa7b2fad7399e54c0e60"
+        },
+        {
+          "path": "assets/Ilustraciones/agenda.svg",
+          "id": "8a45d5130fcd36a899246903a1d9a0bb"
+        },
+        {
+          "path": "assets/Ilustraciones/impresora.svg",
+          "id": "52fc1113cfa0c4c0f9663a85ca87f205"
+        },
+        {
+          "path": "assets/Ilustraciones/datos.svg",
+          "id": "97e3404bc434918b7e33a3d3822cf58d"
+        },
+        {
+          "path": "assets/Ilustraciones/login.svg",
+          "id": "a0906de3930972255eb17195a3e9f836"
+        }
+      ]
+    }
+  ],
+  "storage": {
+    "files": {
+      "assets/Ilustraciones/agenda.svg": {
+        "store": "blob",
+        "id": "8a45d5130fcd36a899246903a1d9a0bb",
+        "bytes": 79089,
+        "type": "image/svg+xml"
+      },
+      "assets/Ilustraciones/anden.svg": {
+        "store": "blob",
+        "id": "7502df155cf627f909f784ee6875b86f",
+        "bytes": 149679,
+        "type": "image/svg+xml"
+      },
+      "assets/Ilustraciones/bulto.svg": {
+        "store": "blob",
+        "id": "22703e1a591f4d8613c14c97e2fab84d",
+        "bytes": 5126,
+        "type": "image/svg+xml"
+      },
+      "assets/Ilustraciones/caseta.svg": {
+        "store": "blob",
+        "id": "efe80427e454dde90c4f9f961ec5b02d",
+        "bytes": 51449,
+        "type": "image/svg+xml"
+      },
+      "assets/Ilustraciones/cedis.svg": {
+        "store": "blob",
+        "id": "75e6c57a6febfeeef315832cf1127da2",
+        "bytes": 320976,
+        "type": "image/svg+xml"
+      },
+      "assets/Ilustraciones/clips.svg": {
+        "store": "blob",
+        "id": "e79bb8a39aa82cb2ff3266fd81c4f26b",
+        "bytes": 5705,
+        "type": "image/svg+xml"
+      },
+      "assets/Ilustraciones/datos.svg": {
+        "store": "blob",
+        "id": "97e3404bc434918b7e33a3d3822cf58d",
+        "bytes": 23892,
+        "type": "image/svg+xml"
+      },
+      "assets/Ilustraciones/embarque.svg": {
+        "store": "blob",
+        "id": "983f425ecb85aa7b2fad7399e54c0e60",
+        "bytes": 116448,
+        "type": "image/svg+xml"
+      },
+      "assets/Ilustraciones/hojas.svg": {
+        "store": "blob",
+        "id": "bb5b5c1dab8bf934ec20d84573c4ea05",
+        "bytes": 9876,
+        "type": "image/svg+xml"
+      },
+      "assets/Ilustraciones/impresora.svg": {
+        "store": "blob",
+        "id": "52fc1113cfa0c4c0f9663a85ca87f205",
+        "bytes": 5547,
+        "type": "image/svg+xml"
+      },
+      "assets/Ilustraciones/lapices.svg": {
+        "store": "blob",
+        "id": "e834e115ade1dd4cb88bf71dafbd0f37",
+        "bytes": 17379,
+        "type": "image/svg+xml"
+      },
+      "assets/Ilustraciones/login.svg": {
+        "store": "blob",
+        "id": "a0906de3930972255eb17195a3e9f836",
+        "bytes": 33357,
+        "type": "image/svg+xml"
+      },
+      "assets/Ilustraciones/recibo.svg": {
+        "store": "blob",
+        "id": "bf5e635937aa2b3cc29207bb07a729ba",
+        "bytes": 126780,
+        "type": "image/svg+xml"
+      },
+      "assets/Ilustraciones/sucursal.svg": {
+        "store": "blob",
+        "id": "b911d12139262f070fd6e7f4bfc1e5a7",
+        "bytes": 104402,
+        "type": "image/svg+xml"
+      }
+    },
+    "blobBytesUsed": 1049705
+  }
+}

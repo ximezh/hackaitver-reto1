@@ -1,0 +1,137 @@
+<!-- @dsCard group="CEDIS · Android" height=860 subtitle="Tarima virtual 3D por peso" -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Tarima 3D</title>
+<style>
+.vp{position:relative;height:300px;margin:0 16px;border-radius:20px;background:radial-gradient(120% 90% at 50% 20%,#ffffff 0%,var(--brand-50) 70%);border:1px solid var(--line);overflow:hidden;perspective:900px;cursor:grab;touch-action:none;user-select:none}
+.vp:active{cursor:grabbing}
+.world{position:absolute;left:50%;top:76%;width:0;height:0;transform-style:preserve-3d}
+.cub{position:absolute;left:0;top:0;width:0;height:0;transform-style:preserve-3d;transition:transform .45s cubic-bezier(.2,.8,.2,1)}
+.f{transition:opacity .3s}
+.f{position:absolute;left:50%;top:50%;backface-visibility:visible}
+.f.load{background-image:linear-gradient(rgba(0,0,0,.16) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,.16) 1px,transparent 1px);border:1px solid rgba(0,0,0,.22)}
+.f.wood{border:1px solid rgba(80,50,20,.35)}
+.f.lbl{display:grid;place-items:center;color:#fff;font-weight:700;font-size:12px;text-shadow:0 1px 2px rgba(0,0,0,.35)}
+.f.film{background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.55);pointer-events:none}
+.f.max{border:1.5px dashed rgba(31,95,214,.55);pointer-events:none}
+.shadow{position:absolute;left:50%;top:50%;width:200px;height:200px;margin:-100px 0 0 -100px;border-radius:50%;background:radial-gradient(closest-side,rgba(15,31,61,.18),transparent);transform:rotateX(90deg)}
+.cub.dim .f{opacity:.2}
+.tools{position:absolute;right:10px;top:10px;display:flex;flex-direction:column;gap:6px}
+.tools button{width:38px;height:38px;border-radius:12px;border:1px solid var(--line);background:#fff;display:grid;place-items:center;color:var(--ink)}
+.tools button.on{background:var(--brand-600);color:#fff;border-color:var(--brand-600)}
+.hint{position:absolute;left:12px;bottom:10px;display:flex;gap:6px;align-items:center;font-size:11px;color:var(--ink-muted);background:rgba(255,255,255,.8);padding:4px 10px;border-radius:99px}
+.hmax{position:absolute;left:12px;top:12px}
+.meters{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:12px 16px 0}
+.meter{padding:10px 12px}
+.meter .v{font-size:15px;font-weight:700;line-height:20px}
+.meter .v small{font-size:11px;font-weight:500;color:var(--ink-muted)}
+.meter .bar{height:8px;margin-top:6px}
+.zones{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:12px 16px 0}
+.zone{border:1.5px solid var(--line);background:#fff;border-radius:16px;padding:10px;text-align:left;display:flex;flex-direction:column;gap:6px;transition:.15s}
+.zone .sw{width:100%;height:26px;border-radius:8px;background-image:linear-gradient(rgba(0,0,0,.14) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,.14) 1px,transparent 1px);background-size:13px 13px}
+.zone.on{border-color:var(--ink);box-shadow:var(--shadow-card)}
+.zone b{font-size:15px;line-height:18px}
+.items{margin:12px 16px 90px}
+.item{display:flex;align-items:center;gap:12px;padding:10px 12px}
+.item.new{animation:flash 1.2s}
+@keyframes flash{0%{background:var(--brand-50)}100%{background:transparent}}
+.actions{position:absolute;left:0;right:0;bottom:0;padding:12px 16px 18px;background:linear-gradient(180deg,rgba(245,248,253,0),var(--surface-50) 30%);display:flex;gap:10px}
+.fly{position:absolute;z-index:40;width:44px;height:44px;border-radius:10px;transition:all .7s cubic-bezier(.5,0,.3,1);box-shadow:var(--shadow-pop)}
+</style></head>
+<body>
+<div class="stage"><div class="phone"><div class="screen" id="scr">
+  <div id="sb"></div>
+  <div class="appbar"><button class="iconbtn" id="back" aria-label="Regresar"></button><div class="grow"><div class="t-cap">Suc. 07 Boca del Río</div><h1>Tarima T-07-03</h1></div><span class="chip warn"><span class="dot"></span>Armando</span></div>
+  <div class="scroll" id="scroll">
+    <div class="vp" id="vp"><div class="world" id="world"></div>
+      <div class="tools"><button id="rl" aria-label="Girar a la izquierda"></button><button id="rr" aria-label="Girar a la derecha"></button><button id="ex" aria-label="Separar cajas"></button><button id="rs" aria-label="Vista inicial"></button></div>
+      <span class="chip mute hmax" id="hmax"></span>
+      <div class="hint" id="hint"></div>
+    </div>
+    <div class="meters">
+      <div class="card meter"><div class="t-cap">Peso · kg</div><div class="v" id="mk"></div><div class="bar"><i id="bk"></i></div></div>
+      <div class="card meter"><div class="t-cap">Vol. · m³</div><div class="v" id="mv"></div><div class="bar"><i id="bv"></i></div></div>
+      <div class="card meter"><div class="t-cap">Altura · m</div><div class="v" id="mh"></div><div class="bar"><i id="bh"></i></div></div>
+    </div>
+    <div class="zones" id="zones"></div>
+    <div class="card items list" id="items"></div>
+  </div>
+  <div class="actions"><button class="btn primary" style="flex:1" id="add"></button><button class="btn line" id="close" aria-label="Cerrar tarima"></button></div>
+</div></div></div>
+<script>
+(function(){
+  var C=window.Cedis,$=function(i){return document.getElementById(i)};
+  $('sb').innerHTML=C.statusBar(); $('back').innerHTML=C.ic('left');
+  $('rl').innerHTML=C.ic('rotateL',18); $('rr').innerHTML=C.ic('rotate',18); $('ex').innerHTML=C.ic('layers',18); $('rs').innerHTML=C.ic('cube',18);
+  $('hint').innerHTML=C.ic('rotate',14)+'Arrastra para girar'; $('add').innerHTML=C.ic('scan',20)+'Escanear bulto'; $('close').innerHTML=C.ic('check',20);
+  var CAP_KG=1000, W=1.12, D=1.15, BASE=0.15, HMAX=1.85, CAP_M3=W*D*(HMAX-BASE), S=96; /* px por metro */
+  /* líneas en la tarima: SKU y número de bultos */
+  var lines=[['RES-0500',8],['CUA-0100',6],['FOL-0100',10],['ENG-0020',6],['PAP-0100',14],['LAP-0012',10],['CLI-0100',26]];
+  var order=['roja','naranja','verde'], sel='roja', exploded=false, rx=-22, ry=-38, lastSku=null;
+  function totals(){ var t={kg:0,m3:0,z:{roja:{kg:0,m3:0,n:0},naranja:{kg:0,m3:0,n:0},verde:{kg:0,m3:0,n:0}}};
+    lines.forEach(function(l){var p=C.bySku(l[0]),z=t.z[C.zona(p.kg)];z.kg+=p.kg*l[1];z.m3+=p.m3*l[1];z.n+=l[1];t.kg+=p.kg*l[1];t.m3+=p.m3*l[1];}); return t; }
+  function face(cls,w,h,tf,bg,extra){return '<div class="f '+cls+'" style="width:'+w+'px;height:'+h+'px;margin:'+(-h/2)+'px 0 0 '+(-w/2)+'px;transform:'+tf+';'+(bg?'background-color:'+bg+';':'')+(extra||'')+'"></div>';}
+  /* cubo: centro en x,z; base en y (metros, y hacia arriba) */
+  function cuboid(o){ var w=o.w*S,h=o.h*S,d=o.d*S,yb=-o.y*S, c=o.c, cls=o.cls||'', bs=o.bs||'';
+    var ty='translateY('+(yb-h/2)+'px) ';
+    var dark=o.shade?'filter:brightness(.82);':'', darker=o.shade?'filter:brightness(.7);':'', light=o.shade?'filter:brightness(1.08);':'';
+    var html=face(cls,w,h,ty+'translateZ('+d/2+'px)',c,bs+light)+face(cls,w,h,ty+'translateZ('+(-d/2)+'px) rotateY(180deg)',c,bs+darker)+
+      face(cls,d,h,ty+'translateX('+w/2+'px) rotateY(90deg)',c,bs+dark)+face(cls,d,h,ty+'translateX('+(-w/2)+'px) rotateY(-90deg)',c,bs+dark)+
+      face(cls,w,d,'translateY('+(yb-h)+'px) rotateX(90deg)',c,bs+'filter:brightness(1.15);')+face(cls,w,d,'translateY('+yb+'px) rotateX(-90deg)',c,bs+darker);
+    if(o.label) html+='<div class="f lbl" style="width:'+w+'px;height:'+h+'px;margin:'+(-h/2)+'px 0 0 '+(-w/2)+'px;transform:'+ty+'translateZ('+(d/2+0.5)+'px)">'+o.label+'</div>';
+    return '<div class="cub '+(o.k||'')+'" data-z="'+(o.z||'')+'" style="transform:translate3d('+(o.x||0)*S+'px,0,'+(o.zz||0)*S+'px)">'+html+'</div>'; }
+  function build(){ var t=totals(), html='<div class="shadow"></div>', wood='#c99a62';
+    /* tarima: tablas inferiores, 9 tacos, cubierta */
+    [-0.47,0,0.47].forEach(function(z){html+=cuboid({w:W,h:0.022,d:0.14,y:0,zz:z,c:'#b88752',cls:'wood',shade:1});});
+    [-0.47,0,0.47].forEach(function(x){[-0.47,0,0.47].forEach(function(z){html+=cuboid({w:0.12,h:0.1,d:0.12,y:0.022,x:x,zz:z,c:'#a8794a',cls:'wood',shade:1});});});
+    html+=cuboid({w:W,h:0.028,d:D,y:0.122,c:wood,cls:'wood',shade:1,bs:'background-image:repeating-linear-gradient(90deg,transparent 0 22px,rgba(80,50,20,.35) 22px 24px);'});
+    var y=BASE, gap=exploded?0.14:0;
+    order.forEach(function(k){ var z=t.z[k]; if(!z.m3)return; var h=z.m3/(W*D)*1.0; y+=gap;
+      html+=cuboid({w:W*0.97,h:h,d:D*0.97,y:y,c:C.zonas[k].hex,cls:'load',shade:1,k:(sel&&sel!==k?'dim':''),z:k,label:'<span style="color:'+C.zonas[k].fg+'">'+Math.round(z.kg)+' kg</span>',bs:'background-size:'+(W*S/4)+'px '+Math.max(14,h*S/3)+'px;'});
+      y+=h; });
+    if(!exploded) html+=cuboid({w:W*0.99,h:y-BASE+0.01,d:D*0.99,y:BASE,cls:'film'});
+    /* plano de altura máxima */
+    html+='<div class="f max" style="width:'+W*S+'px;height:'+D*S+'px;margin:'+(-D*S/2)+'px 0 0 '+(-W*S/2)+'px;transform:translateY('+(-HMAX*S)+'px) rotateX(90deg)"></div>';
+    $('world').innerHTML=html; orient(); return {t:t,h:y-gap*3};
+  }
+  function orient(){ $('world').style.transform='translateY(-6px) rotateX('+rx+'deg) rotateY('+ry+'deg)'; }
+  function panel(){ var r=build(), t=r.t, h=Math.min(r.h+(exploded?0.42:0),HMAX);
+    var hReal=BASE; order.forEach(function(k){hReal+=t.z[k].m3/(W*D)});
+    $('hmax').innerHTML=C.ic('up',14,2)+'Máx. 1.85 m';
+    $('mk').innerHTML=Math.round(t.kg)+' <small>/ 1,000</small>'; $('bk').style.width=Math.min(100,t.kg/CAP_KG*100)+'%';
+    $('mv').innerHTML=t.m3.toFixed(2)+' <small>/ '+CAP_M3.toFixed(2)+'</small>'; $('bv').style.width=Math.min(100,t.m3/CAP_M3*100)+'%';
+    $('mh').innerHTML=hReal.toFixed(2)+' <small>/ 1.85</small>'; $('bh').style.width=Math.min(100,hReal/HMAX*100)+'%';
+    $('bk').parentNode.className='bar'+(t.kg/CAP_KG>.9?' ok':'');
+    $('zones').innerHTML=order.map(function(k){var Z=C.zonas[k],z=t.z[k];return '<button class="zone '+(sel===k?'on':'')+'" data-k="'+k+'"><span class="sw" style="background-color:'+Z.hex+'"></span><span class="t-cap">'+Z.nombre+'</span><b>'+C.kg(z.kg)+'</b><span class="t-cap">'+z.n+' bultos</span></button>'}).join('');
+    var list=lines.filter(function(l){return !sel||C.zona(C.bySku(l[0]).kg)===sel});
+    $('items').innerHTML='<div class="item" style="background:var(--surface-50)"><span class="dot" style="color:'+C.zonas[sel].hex+';width:12px;height:12px"></span><span class="t-data grow">'+C.zonas[sel].nombre+'</span><span class="t-cap">'+C.zonas[sel].desc+'</span></div>'+
+      list.map(function(l){var p=C.bySku(l[0]);return '<div class="item'+(l[0]===lastSku?' new':'')+'"><span class="thumb"><img src="'+C.A[p.img]+'" alt=""></span><div class="grow"><div class="t-data ellip">'+p.nombre+'</div><div class="t-cap">'+l[1]+' bultos · '+C.kg(p.kg)+' c/u</div></div><b>'+C.kg(p.kg*l[1])+'</b></div>'}).join('');
+    lastSku=null;
+  }
+  $('zones').onclick=function(e){var b=e.target.closest('.zone');if(!b)return;sel=b.dataset.k;panel();};
+  $('world').addEventListener('click',function(e){var c=e.target.closest('.cub');if(c&&c.dataset.z){sel=c.dataset.z;panel();}});
+  /* giro manual */
+  var drag=null; $('vp').addEventListener('pointerdown',function(e){if(e.target.closest('.tools'))return;drag={x:e.clientX,y:e.clientY,rx:rx,ry:ry,m:0};});
+  window.addEventListener('pointermove',function(e){if(!drag)return;var dx=e.clientX-drag.x,dy=e.clientY-drag.y;drag.m=Math.abs(dx)+Math.abs(dy);
+    ry=drag.ry+dx*0.5; rx=Math.max(-80,Math.min(-4,drag.rx-dy*0.35)); orient(); $('hint').style.opacity=0;});
+  window.addEventListener('pointerup',function(){drag=null;});
+  $('rl').onclick=function(){ry-=45;orient()}; $('rr').onclick=function(){ry+=45;orient()};
+  $('rs').onclick=function(){rx=-22;ry=-38;orient()};
+  $('ex').onclick=function(){exploded=!exploded;this.classList.toggle('on',exploded);panel();};
+  /* escaneo: el bulto se manda a su caja según su peso */
+  var queue=['LAP-0012','RES-0500','ENG-0020','CLI-0100','FOL-0100','PAP-0100'], qi=0;
+  $('add').onclick=function(){ var sku=queue[qi++%queue.length], p=C.bySku(sku), t=totals();
+    if(t.kg+p.kg>CAP_KG||t.m3+p.m3>CAP_M3){C.toast($('scr'),'Excede la capacidad de la tarima','alert');return;}
+    var k=C.zona(p.kg), f=document.createElement('img'); f.src=C.A[p.img]; f.className='fly'; f.style.background='#fff';
+    var sr=$('scr').getBoundingClientRect(), ar=$('add').getBoundingClientRect(), vr=$('vp').getBoundingClientRect();
+    f.style.left=(ar.left-sr.left+20)+'px'; f.style.top=(ar.top-sr.top-10)+'px'; $('scr').appendChild(f);
+    requestAnimationFrame(function(){requestAnimationFrame(function(){f.style.left=(vr.left-sr.left+vr.width/2-22)+'px';f.style.top=(vr.top-sr.top+vr.height/2-40)+'px';f.style.transform='scale(.4)';f.style.opacity='.2';});});
+    setTimeout(function(){f.remove(); var l=lines.filter(function(x){return x[0]===sku})[0]; if(l)l[1]++; else lines.push([sku,1]);
+      sel=k; lastSku=sku; panel(); C.toast($('scr'),p.nombre.split(',')[0]+' · '+C.kg(p.kg)+' → '+C.zonas[k].nombre,'check');},720);
+  };
+  $('close').onclick=function(){var t=totals();C.toast($('scr'),t.kg/CAP_KG>=.9?'Tarima cerrada y emplayada':'Tarima al '+Math.round(t.kg/CAP_KG*100)+'% · puedes seguir cargando','info');};
+  panel();
+})();
+</script>
+</body>
+</html>

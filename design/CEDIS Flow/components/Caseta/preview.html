@@ -1,0 +1,87 @@
+<!-- @dsCard group="CEDIS · Android" height=860 subtitle="Check-in y check-out de camiones" -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Caseta</title>
+<style>
+.docks{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;padding:0 16px}
+.dock{height:58px;border-radius:12px;border:1.5px solid var(--line);background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:10px;font-weight:600;color:var(--ink-muted);position:relative}
+.dock.busy{background:var(--brand-600);border-color:var(--brand-600);color:#fff}
+.dock.out.busy{background:var(--ink);border-color:var(--ink)}
+.dock b{font-size:14px}
+.sep{width:1px}
+.kp{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 16px}
+.kp .card{padding:10px 12px}
+.kp b{font-size:22px;line-height:28px;display:block}
+.tl{padding:0 16px 100px;display:flex;flex-direction:column;gap:10px}
+.ap{display:flex;gap:12px;align-items:center;padding:12px}
+.hr{width:54px;flex:none;text-align:center}
+.hr b{display:block;font-size:16px}
+.plate{display:inline-block;border:1.5px solid var(--ink);border-radius:6px;padding:0 6px;font-size:11px;font-weight:700;letter-spacing:.06em;line-height:18px;white-space:nowrap}
+.ap .act{width:44px;height:44px;border-radius:14px;border:0;display:grid;place-items:center;flex:none}
+.ap .act.in{background:var(--brand-600);color:#fff}.ap .act.out{background:var(--ink);color:#fff}.ap .act.done{background:var(--success-50);color:var(--success)}
+.ill{height:120px;display:grid;place-items:center;background:var(--brand-50);border-radius:16px;margin-bottom:12px}
+.ill img{height:110px}
+.scanbox{position:relative;height:170px;border-radius:16px;background:#0f1f3d;margin-bottom:12px;overflow:hidden;display:grid;place-items:center}
+.scanbox .frame{width:150px;height:110px;border:3px solid rgba(255,255,255,.85);border-radius:14px}
+.scanbox .ln{position:absolute;left:20%;right:20%;height:2px;background:#5b9bff;box-shadow:0 0 12px #5b9bff;animation:scanline 2s infinite}
+</style></head>
+<body>
+<div class="stage"><div class="phone"><div class="screen" id="scr">
+  <div id="sb"></div>
+  <div class="appbar"><div class="avatar">JL</div><div class="grow"><h1 style="font-size:18px;line-height:24px">Caseta</h1><div class="sub">Mié 25 nov · Turno 8:00–18:00</div></div><button class="iconbtn" id="bell" aria-label="Avisos"></button></div>
+  <div class="scroll">
+    <div class="kp" id="kp"></div>
+    <div class="t-over" style="padding:16px 16px 8px">Andenes</div>
+    <div class="docks" id="docks"></div>
+    <div class="row t-cap" style="padding:8px 16px 0;gap:14px"><span class="row" style="gap:6px"><i class="dot" style="color:var(--brand-600)"></i>Recibo</span><span class="row" style="gap:6px"><i class="dot" style="color:var(--ink)"></i>Embarque</span><span class="row" style="gap:6px"><i class="dot" style="color:var(--line)"></i>Libre</span></div>
+    <div style="padding:16px 16px 10px"><div class="seg" id="seg"><button class="on" data-v="in"></button><button data-v="out"></button></div></div>
+    <div class="tl" id="tl"></div>
+  </div>
+  <button class="fab" id="fab" aria-label="Escanear cita"></button>
+  <nav class="tabbar" id="tabs"></nav>
+  <div class="sheet" id="sh"><div class="body" id="shb"></div></div>
+</div></div></div>
+<script>
+(function(){
+  var C=window.Cedis,$=function(i){return document.getElementById(i)};
+  $('sb').innerHTML=C.statusBar(); $('bell').innerHTML=C.ic('bell'); $('fab').innerHTML=C.ic('qr',28);
+  var mode='in';
+  var citas=[
+    {h:'08:00',p:'Distribuidora Atlas',a:'R1',pl:'XKT-482-B',st:'out',oc:'OC-26-1170',min:60},
+    {h:'09:00',p:'Papelera del Golfo',a:'R2',pl:'VCZ-119-A',st:'dentro',oc:'OC-26-1182',min:120},
+    {h:'10:00',p:'Grupo Escolar MX',a:'R3',pl:'HPL-730-C',st:'espera',oc:'OC-26-1191',min:60,late:0},
+    {h:'10:30',p:'Útiles del Sureste',a:'R4',pl:'MNX-204-D',st:'espera',oc:'OC-26-1194',min:90,late:15},
+    {h:'11:00',p:'Distribuidora Atlas',a:'R1',pl:'XKT-511-B',st:'espera',oc:'OC-26-1198',min:60,late:0}];
+  var salidas=[{h:'10:15',p:'Suc. 07 Boca del Río',a:'E1',pl:'TOR-551-V',st:'dentro',oc:'EMB-0412',min:0},{h:'11:40',p:'Suc. 04 Xalapa',a:'E2',pl:'TOR-318-V',st:'dentro',oc:'EMB-0413',min:0},{h:'08:30',p:'Suc. 12 Córdoba',a:'E3',pl:'TOR-702-V',st:'out',oc:'EMB-0410',min:0}];
+  var busy={R2:1,E1:1,E2:1};
+  function draw(){
+    var inYard=citas.filter(function(c){return c.st==='dentro'}).length+salidas.filter(function(c){return c.st==='dentro'}).length;
+    $('kp').innerHTML=[['Dentro',inYard,'truck'],['Por llegar',citas.filter(function(c){return c.st==='espera'}).length+'',''],['Salieron',citas.filter(function(c){return c.st==='out'}).length+salidas.filter(function(c){return c.st==='out'}).length,'']].map(function(k){return '<div class="card"><span class="t-cap">'+k[0]+'</span><b>'+k[1]+'</b></div>'}).join('');
+    var d=''; ['R1','R2','R3','R4','E1','E2','E3'].forEach(function(a){d+='<div class="dock '+(a[0]==='E'?'out ':'')+(busy[a]?'busy':'')+'">'+C.ic(a[0]==='R'?'login':'exit',14,2)+'<b>'+a+'</b></div>'}); $('docks').innerHTML=d;
+    var segB=$('seg').children; segB[0].innerHTML=C.ic('login',16)+'Entradas'; segB[1].innerHTML=C.ic('exit',16)+'Salidas';
+    var L=mode==='in'?citas:salidas;
+    $('tl').innerHTML=L.map(function(c,i){
+      var chip=c.st==='dentro'?'<span class="chip">'+(mode==='in'?'Descargando':'Cargando')+'</span>':c.st==='out'?'<span class="chip ok">Salió</span>':c.late?'<span class="chip warn">+'+c.late+' min</span>':'<span class="chip mute">A tiempo</span>';
+      var act=c.st==='espera'?'<button class="act in" data-i="'+i+'" data-a="in" aria-label="Check-in">'+C.ic('login',22)+'</button>':c.st==='dentro'?'<button class="act out" data-i="'+i+'" data-a="out" aria-label="Check-out">'+C.ic('exit',22)+'</button>':'<span class="act done">'+C.ic('check',22,2.4)+'</span>';
+      return '<div class="card ap"><div class="hr"><b>'+c.h+'</b><span class="t-cap">'+c.a+'</span></div><div class="grow"><div class="t-data ellip">'+c.p+'</div><div class="row" style="gap:8px;margin-top:4px"><span class="plate">'+c.pl+'</span>'+chip+'</div></div>'+act+'</div>'}).join('');
+  }
+  $('seg').onclick=function(e){var b=e.target.closest('button');if(!b)return;mode=b.dataset.v;[].forEach.call(this.children,function(x){x.classList.toggle('on',x===b)});draw();};
+  function sheet(c,a,i){ var L=mode==='in'?citas:salidas;
+    $('shb').innerHTML='<div class="grab"></div><div class="ill"><img src="'+(a==='in'?C.A.anden:C.A.embarque)+'" alt=""></div>'+
+      '<div class="row"><div class="grow"><div class="t-cap">'+(a==='in'?'Check-in':'Check-out')+' · '+c.oc+'</div><div class="t-sub">'+c.p+'</div></div><span class="plate" style="font-size:13px;line-height:24px">'+c.pl+'</span></div>'+
+      '<div class="row" style="gap:8px;margin:12px 0"><span class="chip">'+C.ic('calendar',14,2)+c.h+'</span><span class="chip">'+C.ic('warehouse',14,2)+'Andén '+c.a+'</span>'+(c.min?'<span class="chip mute">'+C.ic('clock',14,2)+c.min+' min</span>':'')+'</div>'+
+      (a==='in'?'<label class="field sm" style="margin-bottom:10px"><span>'+C.ic('user',18)+'</span><input placeholder="Operador" value="Raúl Méndez"></label><label class="field sm" style="margin-bottom:14px"><span>'+C.ic('lock',18)+'</span><input placeholder="Sello" value="SL-77120"></label>':'<div class="card pad row" style="margin-bottom:14px"><span class="thumb">'+C.ic('check',22,2.4)+'</span><div class="grow"><div class="t-data">Sello y documentos</div><div class="t-cap">Relación de embarque firmada</div></div></div>')+
+      '<button class="btn primary block" id="ok">'+C.ic(a==='in'?'login':'exit',20)+(a==='in'?'Registrar entrada':'Registrar salida')+'</button>';
+    $('sh').classList.add('open');
+    $('ok').onclick=function(){ c.st=a==='in'?'dentro':'out'; if(a==='in')busy[c.a]=1; else delete busy[c.a]; $('sh').classList.remove('open'); draw(); C.toast($('scr'),(a==='in'?'Entrada ':'Salida ')+c.pl+' · '+new Date().toTimeString().slice(0,5),'check'); };
+  }
+  $('tl').onclick=function(e){var b=e.target.closest('button.act');if(!b)return;var L=mode==='in'?citas:salidas;sheet(L[+b.dataset.i],b.dataset.a,+b.dataset.i);};
+  $('sh').onclick=function(e){if(e.target===this)this.classList.remove('open')};
+  $('fab').onclick=function(){ $('shb').innerHTML='<div class="grab"></div><div class="scanbox"><div class="frame"></div><div class="ln"></div></div><div class="t-sub" style="text-align:center">Escanea el QR de la cita</div><div class="t-cap" style="text-align:center">o la placa del camión</div>'; $('sh').classList.add('open');
+    setTimeout(function(){ var c=citas.filter(function(x){return x.st==='espera'})[0]; if(c){mode='in';[].forEach.call($('seg').children,function(x,i){x.classList.toggle('on',i===0)});draw();sheet(c,'in');} else $('sh').classList.remove('open'); },1500); };
+  $('tabs').innerHTML=[['home','Inicio',1],['calendar','Citas'],['history','Historial'],['user','Perfil']].map(function(t){return '<button class="'+(t[2]?'on':'')+'"><span class="pill">'+C.ic(t[0],20)+'</span>'+t[1]+'</button>'}).join('');
+  draw();
+})();
+</script>
+</body>
+</html>

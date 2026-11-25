@@ -1,0 +1,92 @@
+<!-- @dsCard group="CEDIS · Android" height=860 subtitle="Detalle visual del bulto" -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Bulto</title>
+<style>
+.car{position:relative;background:linear-gradient(180deg,var(--brand-50),#f9fbff);height:270px;overflow:hidden;touch-action:pan-y;user-select:none}
+.track{display:flex;height:100%;transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.slide{flex:0 0 100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:10px}
+.slide img{width:230px;height:190px;object-fit:contain;pointer-events:none}
+.slide .cap{margin:0}
+.nav-r,.nav-l{position:absolute;top:110px;width:40px;height:40px;border-radius:99px;border:1px solid var(--line);background:#fff;display:grid;place-items:center;color:var(--ink);box-shadow:var(--shadow-card)}
+.nav-r{right:12px}.nav-l{left:12px}
+.pdots{position:absolute;bottom:10px;left:0;right:0;display:flex;gap:6px;justify-content:center}
+.pdots i{width:8px;height:8px;border-radius:99px;background:#c8d5ee;transition:.25s}.pdots i.on{width:26px;background:var(--brand-600)}
+.units{display:grid;grid-template-columns:repeat(5,40px);gap:8px}
+.units img{width:40px;height:34px;object-fit:contain;animation:pop .3s both}
+.strip{display:flex;gap:8px;padding:12px 16px 0;overflow-x:auto}
+.strip button{flex:none;display:flex;align-items:center;gap:8px;border:1.5px solid var(--line);background:#fff;border-radius:14px;padding:6px 10px 6px 6px;font-size:12px;font-weight:600;color:var(--ink-muted)}
+.strip button img{width:30px;height:30px;object-fit:contain;background:var(--brand-50);border-radius:8px;padding:2px}
+.strip button.on{border-color:var(--brand-600);color:var(--brand-700);background:var(--brand-50)}
+.more{overflow:hidden;max-height:0;transition:max-height .45s ease}
+.more.open{max-height:520px}
+.dl{display:grid;grid-template-columns:1fr 1fr;gap:14px 12px;padding:16px 0 4px}
+.dl .t-data{font-size:14px}
+.qrcard{display:flex;gap:14px;align-items:center;background:var(--surface-50);border:1px solid var(--line);border-radius:16px;padding:12px;margin-top:10px}
+</style></head>
+<body>
+<div class="stage"><div class="phone"><div class="screen" id="scr">
+  <div id="sb"></div>
+  <div class="appbar"><button class="iconbtn" id="back" aria-label="Regresar"></button><div class="grow"><div class="t-cap">Bulto</div><h1 id="folio" style="font-size:20px;margin:0">B-0003</h1></div><span class="chip" id="st"></span></div>
+  <div class="scroll">
+    <div class="car" id="car"><div class="track" id="track"></div>
+      <button class="nav-l" id="pv" aria-label="Anterior"></button><button class="nav-r" id="nx" aria-label="Siguiente"></button>
+      <div class="pdots" id="dots"></div></div>
+    <div class="t-over" style="padding:14px 16px 0">Bultos de la factura <span id="fac"></span></div>
+    <div class="strip" id="strip"></div>
+    <div style="padding:14px 16px 18px">
+      <div class="t-sub" id="tit"></div>
+      <div class="t-cap" id="meta" style="margin-top:2px"></div>
+      <div class="row" style="gap:6px;margin-top:10px"><span class="chip mute" id="ck1"></span><span class="chip ok" id="ck2"></span></div>
+      <button class="btn soft block" id="vm" style="margin-top:14px"></button>
+      <div class="more" id="more"><div class="dl" id="dl"></div>
+        <div class="qrcard"><div id="qr"></div><div class="grow"><div class="t-cap">Etiqueta del bulto</div><div class="t-data" style="font-size:13px;line-height:18px">Bulto · OC · sucursal · SKU · piezas</div><button class="btn primary sm" id="dw" style="margin-top:8px"></button></div></div>
+      </div>
+    </div>
+  </div>
+</div></div></div>
+<script>
+(function(){
+  var C=window.Cedis,$=function(i){return document.getElementById(i)};
+  $('sb').innerHTML=C.statusBar(); $('back').innerHTML=C.ic('left'); $('pv').innerHTML=C.ic('left',18); $('nx').innerHTML=C.ic('right',18);
+  var base={oc:'OC-26-1182',fac:'FAC-A-20418',prov:'Papelera del Golfo',suc:'Suc. 07 Boca del Río'};
+  var bultos=[
+    {id:'B-0003',sku:'PAP-0100',tit:'Caja con 10 paq. de 100 hojas',st:['En andén','']},
+    {id:'B-0004',sku:'LAP-0012',tit:'Caja con 24 cajas de lápiz HB',st:['Recibido','ok']},
+    {id:'B-0005',sku:'CLI-0100',tit:'Caja con 40 cajas de clips',st:['En andén','']}];
+  $('fac').textContent='· '+base.fac;
+  var cur=0, slide=0, open=false;
+  function render(){
+    var b=bultos[cur], p=C.bySku(b.sku);
+    $('folio').textContent=b.id; $('st').className='chip '+b.st[1]; $('st').innerHTML='<span class="dot"></span>'+b.st[0];
+    var units=''; for(var i=0;i<Math.min(p.porBulto,10);i++) units+='<img src="'+C.A[p.img]+'" style="animation-delay:'+(i*40)+'ms" alt="">';
+    var slides=[
+      '<img src="'+C.A.bulto+'" alt="Bulto cerrado"><p class="t-cap cap">Bulto cerrado · etiqueta QR al frente</p>',
+      '<img src="'+C.A[p.img]+'" alt="'+p.nombre+'"><p class="t-cap cap">'+p.nombre+'</p>',
+      '<div class="units">'+units+'</div><div class="t-title" style="margin-top:8px">× '+p.porBulto+'</div><p class="t-cap cap">'+p.unidad+' dentro del bulto</p>'];
+    $('track').innerHTML=slides.map(function(s){return '<div class="slide">'+s+'</div>'}).join('');
+    $('tit').textContent=b.tit;
+    $('meta').textContent=p.porBulto+' '+p.unidad+' · '+C.kg(p.kg)+' · Para '+base.suc;
+    $('ck1').innerHTML=C.ic('box',14,2)+'1 SKU por bulto'; $('ck2').innerHTML=C.ic('check',14,2.4)+'En la OC';
+    $('strip').innerHTML=bultos.map(function(x,i){var q=C.bySku(x.sku);return '<button class="'+(i===cur?'on':'')+'" data-i="'+i+'"><img src="'+C.A[q.img]+'" alt="">'+x.id+'</button>'}).join('');
+    var d=[['Producto',p.nombre],['SKU',p.sku],['Piezas surtidas',p.porBulto+' '+p.unidad],['Peso',C.kg(p.kg)],['Volumen',p.m3.toFixed(3)+' m³'],['Orden de compra',base.oc],['Factura',base.fac],['Proveedor',base.prov],['Sucursal destino',base.suc],['Caja de tarima','<span style="color:'+C.zonas[C.zona(p.kg)].color+'">● </span>'+C.zonas[C.zona(p.kg)].nombre.replace('Caja ','')]];
+    $('dl').innerHTML=d.map(function(r){return '<div><div class="t-cap">'+r[0]+'</div><div class="t-data">'+r[1]+'</div></div>'}).join('');
+    $('qr').innerHTML=C.qr(b.id+base.oc+b.sku,92); go(0);
+  }
+  function go(n){ slide=Math.max(0,Math.min(2,n)); $('track').style.transform='translateX('+(-100*slide)+'%)';
+    $('dots').innerHTML=[0,1,2].map(function(i){return '<i class="'+(i===slide?'on':'')+'"></i>'}).join('');
+    $('pv').style.visibility=slide?'visible':'hidden'; $('nx').style.visibility=slide<2?'visible':'hidden'; }
+  function vm(){ $('vm').innerHTML=(open?'Ver menos ':'Ver más ')+C.ic(open?'up':'down',18); $('more').classList.toggle('open',open); }
+  $('nx').onclick=function(){go(slide+1)}; $('pv').onclick=function(){go(slide-1)};
+  $('vm').onclick=function(){open=!open;vm()}; $('dw').innerHTML=C.ic('download',16)+'Descargar etiqueta';
+  $('dw').onclick=function(){C.toast($('scr'),'Etiqueta lista en PDF','check')};
+  $('strip').onclick=function(e){var b=e.target.closest('button');if(!b)return;cur=+b.dataset.i;render();};
+  var x0=null; $('car').addEventListener('pointerdown',function(e){if(e.target.closest('button'))return;x0=e.clientX});
+  window.addEventListener('pointerup',function(e){if(x0===null)return;var dx=e.clientX-x0;x0=null;
+    if(dx<-40){ if(slide<2)go(slide+1); else if(cur<bultos.length-1){cur++;render();} }
+    else if(dx>40){ if(slide>0)go(slide-1); else if(cur>0){cur--;render();go(2);} } });
+  render(); vm();
+})();
+</script>
+</body>
+</html>

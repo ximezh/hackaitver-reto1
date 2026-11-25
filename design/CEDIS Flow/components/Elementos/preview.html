@@ -1,0 +1,27 @@
+<!-- @dsCard group="Fundamentos" height=460 width=1000 subtitle="Botones, estados, campos, progreso y cajas de tarima" -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Elementos</title>
+<style>
+.el{width:960px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.el .card{padding:18px}
+.el .row{flex-wrap:wrap}
+.zs{display:flex;gap:10px}
+.zs div{flex:1;border-radius:14px;padding:12px;color:#fff;font-weight:600;background-image:linear-gradient(rgba(0,0,0,.14) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,.14) 1px,transparent 1px);background-size:16px 16px}
+.zs small{display:block;font-weight:500;opacity:.95}
+</style></head>
+<body>
+<div class="stage"><div class="el" id="el"></div></div>
+<script>
+(function(){
+  var C=window.Cedis;
+  document.getElementById('el').innerHTML=
+   '<div class="card"><div class="t-over" style="margin-bottom:12px">Botones</div><div class="row"><button class="btn primary">'+C.ic('scan',20)+'Escanear bulto</button><button class="btn soft">Ver más '+C.ic('down',18)+'</button><button class="btn line">'+C.ic('download',18)+'PDF</button><button class="btn danger">'+C.ic('alert',18)+'Reportar</button><button class="btn primary" disabled>Relación</button></div></div>'+
+   '<div class="card"><div class="t-over" style="margin-bottom:12px">Estados</div><div class="row" style="gap:8px"><span class="chip"><span class="dot"></span>En andén</span><span class="chip ok">'+C.ic('check',14,2.4)+'Recibido</span><span class="chip warn">'+C.ic('clock',14,2)+'Faltan 7</span><span class="chip bad">'+C.ic('x',14,2.4)+'Excedente</span><span class="chip mute">En rack</span></div></div>'+
+   '<div class="card"><div class="t-over" style="margin-bottom:12px">Campos</div><label class="field" style="margin-bottom:10px"><span>'+C.ic('user')+'</span><input placeholder="Usuario"></label><div class="seg"><button class="on">'+C.ic('login',16)+'Entradas</button><button>'+C.ic('exit',16)+'Salidas</button></div></div>'+
+   '<div class="card"><div class="t-over" style="margin-bottom:12px">Progreso</div><div class="row" style="justify-content:space-between"><span class="t-cap">Peso de tarima</span><b>567 / 1,000 kg</b></div><div class="bar" style="margin:6px 0 14px"><i style="width:56.7%"></i></div><div class="row" style="justify-content:space-between"><span class="t-cap">Tortón · regla 90%</span><b style="color:var(--success)">94%</b></div><div class="bar ok" style="margin-top:6px"><i style="width:94%"></i></div></div>'+
+   '<div class="card" style="grid-column:1/-1"><div class="t-over" style="margin-bottom:12px">Cajas de la tarima (por peso del bulto)</div><div class="zs"><div style="background-color:var(--pallet-heavy)">Caja roja<small>Pesado · ≥ 15 kg · abajo</small></div><div style="background-color:var(--pallet-mid);color:#3a2300">Caja naranja<small>Intermedio · 7–15 kg · en medio</small></div><div style="background-color:var(--pallet-light)">Caja verde<small>Ligero · < 7 kg · arriba</small></div></div></div>';
+})();
+</script>
+</body>
+</html>
