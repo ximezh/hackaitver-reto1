@@ -1,0 +1,24 @@
+# PostgreSQL para desarrollo local.
+#   docker compose up -d
+# Las credenciales son solo para esta base local; en otros entornos salen de DATABASE_URL.
+name: reto1
+
+services:
+  db:
+    image: docker.io/library/postgres:17
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-reto1}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-reto1}
+      POSTGRES_DB: reto1
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - datos:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d reto1"]
+      interval: 2s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  datos:

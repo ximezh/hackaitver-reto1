@@ -1,0 +1,33 @@
+[project]
+name = "hackaitver-reto1-back"
+version = "0.1.0"
+description = "API del reto 1 de HackAITver"
+requires-python = ">=3.13,<3.14"
+dependencies = [
+    "alembic>=1.20.1",
+    "fastapi[standard]>=0.165.0",
+    "psycopg[binary]>=3.3.9",
+    "pydantic-settings>=2.16.3",
+    "sqlalchemy>=2.1.9",
+]
+
+[dependency-groups]
+dev = [
+    "httpx>=0.28.1",
+    "pytest>=9.2.0",
+    "ruff>=0.17.6",
+]
+
+[tool.uv]
+package = false
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM", "N", "RUF"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--strict-markers"
