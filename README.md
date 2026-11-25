@@ -73,8 +73,9 @@ Abre <http://localhost:5173>. En desarrollo, Vite reenvía las rutas `/api` al b
 | `back/.env` | `APP_ENV` | `development`, `test` o `production`. |
 | `back/.env` | `CORS_ORIGINS` | Orígenes permitidos, en formato JSON. |
 | `front/.env` | `VITE_API_PROXY` | Destino del proxy de `/api` en `npm run dev`. |
+| `front/.env` | `VITE_API_MOCK` | `true` responde con los mocks de `src/api/mocks`, sin back. |
 
-Los archivos `.env` no se versionan. Cada carpeta trae su `.env.example`.
+Los archivos `.env` no se versionan. Cada carpeta trae su `.env.example`. Las variables de staging y producción, y por qué CORS no interviene en el uso normal, están en [infra/README.md](infra/README.md).
 
 ## Comandos
 
