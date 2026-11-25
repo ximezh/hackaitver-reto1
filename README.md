@@ -8,13 +8,13 @@ Aplicación web con front en Vue 3 y API en FastAPI sobre PostgreSQL.
 |---|---|---|
 | Front | Vue 3 (JavaScript), Vite, Vue Router, Pinia, Vitest, ESLint + Oxlint, Prettier | [`front/`](front/) |
 | Back | Python 3.13, FastAPI, SQLAlchemy 2, Alembic, Pydantic Settings, pytest, Ruff | [`back/`](back/) |
-| Base de datos | PostgreSQL 17 (Docker Compose) | [`compose.yaml`](compose.yaml) |
+| Base de datos | PostgreSQL 17 en Podman (`podman compose`) | [`compose.yaml`](compose.yaml) |
 
 ## Requisitos
 
 - Node.js `^22.18` o `>=24.12` y npm
 - [uv](https://docs.astral.sh/uv/) (instala Python 3.13 si hace falta)
-- Docker con Docker Compose, o un PostgreSQL local
+- Podman con `podman compose` (decisión del equipo, issue #3)
 
 ## Estructura
 
@@ -26,7 +26,11 @@ Aplicación web con front en Vue 3 y API en FastAPI sobre PostgreSQL.
 │   └── tests/       pruebas con pytest
 ├── front/           aplicación Vue 3
 │   └── src/
-├── compose.yaml     PostgreSQL de desarrollo
+├── compose.yaml     PostgreSQL de desarrollo (Podman)
+├── infra/           entornos de staging y producción
+├── tools/prototipo/ visor local del prototipo
+├── design/          prototipo (solo lectura)
+├── docs/            plan Scrum, contratos de API e instrucciones de agentes
 └── README.md
 ```
 
@@ -35,7 +39,7 @@ Aplicación web con front en Vue 3 y API en FastAPI sobre PostgreSQL.
 ### 1. Base de datos
 
 ```bash
-docker compose up -d
+podman compose up -d
 ```
 
 Crea la base `reto1` con usuario y contraseña `reto1` en el puerto `5432`. Se pueden cambiar con `POSTGRES_USER`, `POSTGRES_PASSWORD` y `POSTGRES_PORT`.

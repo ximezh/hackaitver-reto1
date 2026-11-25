@@ -100,7 +100,7 @@ Al cerrar un sprint, marca el avance en la tabla «Avance» de tu plan con un co
 
 ```bash
 # Base de datos
-podman compose up -d            # o: docker compose up -d
+podman compose up -d            # solo Podman en local (issue #3)
 
 # Back (en back/)
 uv sync
