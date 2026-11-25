@@ -5,12 +5,14 @@ Antes de recolectar las pruebas se valida la URL, la app se apunta a esa base y 
 """
 
 import os
+from collections.abc import Iterator
 
 import pytest
 from alembic import command
 from alembic.config import Config
 from sqlalchemy import create_engine
 from sqlalchemy.exc import OperationalError
+from sqlalchemy.orm import Session
 from sqlalchemy.pool import NullPool
 
 from app.config import BACK_DIR, get_settings
@@ -45,3 +47,18 @@ def pytest_sessionstart(session: pytest.Session) -> None:
         sonda.dispose()
 
     command.upgrade(Config(BACK_DIR / "alembic.ini"), "head")
+
+
+@pytest.fixture
+def db() -> Iterator[Session]:
+    """Sesión dentro de una transacción que se deshace al final: cada prueba empieza limpia.
+
+    `create_savepoint` permite que el código probado haga `commit()` sin escapar de ella.
+    """
+    with get_engine().connect() as conn, conn.begin() as trans:
+        session = Session(bind=conn, join_transaction_mode="create_savepoint")
+        try:
+            yield session
+        finally:
+            session.close()
+            trans.rollback()
