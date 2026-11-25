@@ -13,7 +13,7 @@ API en FastAPI sobre PostgreSQL 17. Plan del área: [docs/scrum/back.md](../docs
 
 Usuario y contraseña `reto1`, puerto `5432`. Se cambian con `POSTGRES_USER`, `POSTGRES_PASSWORD` y `POSTGRES_PORT`.
 
-### Con Podman
+Por decisión del equipo, el contenedor se maneja con **Podman**.
 
 ```bash
 podman machine init      # solo la primera vez (Windows y macOS)
@@ -21,29 +21,23 @@ podman machine start
 podman compose up -d
 ```
 
-`podman compose` usa por dentro `docker-compose` o `podman-compose`, el que esté instalado.
-
-### Con Docker
-
-```bash
-docker compose up -d
-```
+`podman compose` necesita un proveedor de compose instalado (`podman-compose` o `docker-compose`) y lo usa por dentro, siempre contra el motor de Podman.
 
 ### Comandos útiles
 
-| Tarea | Podman | Docker |
-|---|---|---|
-| Ver si está lista | `podman compose ps` | `docker compose ps` |
-| Abrir `psql` | `podman compose exec db psql -U reto1 reto1` | `docker compose exec db psql -U reto1 reto1` |
-| Detener | `podman compose down` | `docker compose down` |
-| Borrar los datos | `podman compose down -v` | `docker compose down -v` |
+| Tarea | Comando |
+|---|---|
+| Ver si está lista | `podman compose ps` |
+| Abrir `psql` | `podman compose exec db psql -U reto1 reto1` |
+| Detener | `podman compose down` |
+| Borrar los datos | `podman compose down -v` |
 
 ### Si ya tenías el volumen antes de `reto1_test`
 
 `back/db/init/` solo corre cuando el volumen está vacío. Si la base se creó antes, crea la de pruebas una vez:
 
 ```bash
-podman compose exec db createdb -U reto1 reto1_test   # o: docker compose exec …
+podman compose exec db createdb -U reto1 reto1_test
 ```
 
 ## Puesta en marcha

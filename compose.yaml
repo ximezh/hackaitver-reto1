@@ -1,5 +1,5 @@
 # PostgreSQL para desarrollo local y pruebas del back.
-#   podman compose up -d     (o: docker compose up -d)
+#   podman compose up -d     (por decisión del equipo se usa Podman)
 # Crea dos bases: `reto1` para desarrollo y `reto1_test` para pytest (ver back/README.md).
 # Las credenciales son solo para esta base local; en otros entornos salen de DATABASE_URL.
 name: reto1
