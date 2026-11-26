@@ -10,13 +10,14 @@ from pydantic import BaseModel, ConfigDict, Field, PlainSerializer, field_valida
 from app.auth.dependencias import SesionDb, requiere_rol
 from app.catalogos.comun import Lista, eliminar_o_desactivar, falla, listar, obligatorio, obtener
 from app.errores import validacion
-from app.models import Producto, Proveedor
+from app.models import Producto, Proveedor, Usuario
 from app.models.catalogos import ILUSTRACIONES_DE_PRODUCTO
 from app.models.comun import Estado, Rol
 
-router = APIRouter(
-    prefix="/productos", tags=["productos"], dependencies=[Depends(requiere_rol(Rol.OFICINA))]
-)
+router = APIRouter(prefix="/productos", tags=["productos"])
+# Oficina administra el catálogo; Sucursal solo lo lee para pedir (sprint 2).
+SOLO_OFICINA = [Depends(requiere_rol(Rol.OFICINA))]
+Lector = Annotated[Usuario, Depends(requiere_rol(Rol.OFICINA, Rol.SUCURSAL))]
 
 # Un bulto que no cabe en una tarima nunca se podría almacenar (R-09).
 KG_MAXIMO = Decimal("1000")
@@ -141,18 +142,20 @@ def _revisar_proveedor(session: SesionDb, proveedor_id: int | None) -> None:
 
 @router.get("")
 def listar_productos(
-    session: SesionDb, q: Annotated[str | None, Query(title="Búsqueda")] = None
+    usuario: Lector, session: SesionDb, q: Annotated[str | None, Query(title="Búsqueda")] = None
 ) -> Lista[ProductoSalida]:
     items = listar(session, Producto, q, Producto.sku, Producto.nombre)
+    if usuario.rol == Rol.SUCURSAL:
+        items = [p for p in items if p.estado == Estado.ACTIVO]
     return Lista(items=[ProductoSalida.model_validate(p) for p in items], total=len(items))
 
 
-@router.get("/{id_}")
+@router.get("/{id_}", dependencies=SOLO_OFICINA)
 def ver_producto(id_: int, session: SesionDb) -> ProductoSalida:
     return ProductoSalida.model_validate(obtener(session, Producto, id_))
 
 
-@router.post("", status_code=201)
+@router.post("", status_code=201, dependencies=SOLO_OFICINA)
 def crear_producto(datos: ProductoNuevo, session: SesionDb) -> ProductoSalida:
     _revisar_proveedor(session, datos.proveedor_id)
     producto = Producto(**datos.model_dump())
@@ -161,7 +164,7 @@ def crear_producto(datos: ProductoNuevo, session: SesionDb) -> ProductoSalida:
     return ProductoSalida.model_validate(producto)
 
 
-@router.patch("/{id_}")
+@router.patch("/{id_}", dependencies=SOLO_OFICINA)
 def editar_producto(id_: int, cambios: ProductoCambios, session: SesionDb) -> ProductoSalida:
     producto = obtener(session, Producto, id_)
     valores = cambios.model_dump(exclude_unset=True)
@@ -174,6 +177,6 @@ def editar_producto(id_: int, cambios: ProductoCambios, session: SesionDb) -> Pr
     return ProductoSalida.model_validate(producto)
 
 
-@router.delete("/{id_}")
+@router.delete("/{id_}", dependencies=SOLO_OFICINA)
 def eliminar_producto(id_: int, session: SesionDb) -> dict:
     return eliminar_o_desactivar(session, obtener(session, Producto, id_), ProductoSalida)
