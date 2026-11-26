@@ -1,0 +1,43 @@
+#cloud-config
+# Prepara la instancia EC2 (Ubuntu 24.04) para correr los contenedores con Podman sin root,
+# igual que en desarrollo (decisión del issue #3). La usa crear-instancia.sh como user-data.
+
+package_update: true
+package_upgrade: true
+packages:
+  - podman
+  - uidmap
+  - slirp4netns
+  - passt
+  - git
+  - curl
+  - unattended-upgrades
+
+users:
+  - default
+  - name: cedis
+    gecos: Despliegues de CEDIS Flow
+    shell: /bin/bash
+    lock_passwd: true
+
+write_files:
+  # Podman sin root puede abrir 80 y 443 para Caddy.
+  - path: /etc/sysctl.d/90-puertos.conf
+    content: |
+      net.ipv4.ip_unprivileged_port_start=80
+  - path: /etc/profile.d/podman-socket.sh
+    content: |
+      export DOCKER_HOST="unix:///run/user/$(id -u)/podman/podman.sock"
+
+runcmd:
+  - sysctl --system
+  # `podman compose` usa docker-compose como proveedor, igual que en local.
+  - curl -fsSL -o /usr/local/bin/docker-compose https://github.com/docker/compose/releases/download/v2.39.4/docker-compose-linux-x86_64
+  - chmod +x /usr/local/bin/docker-compose
+  # Los servicios del usuario siguen corriendo sin sesión abierta y vuelven al reiniciar.
+  - loginctl enable-linger cedis
+  - mkdir -p /home/cedis/.ssh
+  - cp /home/ubuntu/.ssh/authorized_keys /home/cedis/.ssh/authorized_keys
+  - chown -R cedis:cedis /home/cedis
+  - chmod 700 /home/cedis/.ssh
+  - runuser -l cedis -c 'XDG_RUNTIME_DIR=/run/user/$(id -u cedis) systemctl --user enable --now podman.socket podman-restart.service'

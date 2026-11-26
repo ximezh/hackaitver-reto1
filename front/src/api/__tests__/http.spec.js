@@ -45,7 +45,10 @@ describe('cliente http', () => {
     const alNoAutorizado = vi.fn()
     configurarHttp({ alNoAutorizado })
     registrarMock('get', '/auth/me', () =>
-      respuesta(401, { detail: 'Sesión vencida', code: 'no_autorizado' }),
+      respuesta(401, {
+        detail: 'Tu sesión terminó. Inicia sesión de nuevo',
+        code: 'token_expirado',
+      }),
     )
     await expect(clienteMock().get('/auth/me')).rejects.toBeInstanceOf(ErrorApi)
     expect(alNoAutorizado).toHaveBeenCalledOnce()

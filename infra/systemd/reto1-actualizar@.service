@@ -1,0 +1,10 @@
+# Despliega la última versión publicada de un entorno: reto1-actualizar@produccion o @staging.
+# Se instala como servicio del usuario `cedis` (infra/README.md · Despliegue continuo).
+[Unit]
+Description=CEDIS Flow · actualizar %i
+After=network-online.target
+
+[Service]
+Type=oneshot
+Environment=DOCKER_HOST=unix://%t/podman/podman.sock
+ExecStart=%h/reto1/infra/actualizar.sh %i

@@ -268,7 +268,8 @@ Cada archivo tiene un solo dueño. Un agente no edita archivos de otra área.
 | `docs/api/` (contratos de API) | Back |
 | `.github/`, `infra/`, `tools/`, `Dockerfile` y `.dockerignore` de front y back, `front/nginx.conf.template` | DevOps |
 | `docs/scrum/front.md`, `back.md`, `devops.md` | El área de cada archivo |
-| `docs/scrum.md`, `README.md`, `.gitignore`, `.editorconfig`, `docs/AGENTE.md`, `CLAUDE.md` | Compartidos: se cambian solo con acuerdo del equipo |
+| `docs/AVISOS-front.md`, `AVISOS-back.md`, `AVISOS-devops.md` | Buzón del área: cualquier área agrega avisos; solo la dueña cambia su estado ([AVISOS.md](AVISOS.md)) |
+| `docs/scrum.md`, `docs/AVISOS.md`, `README.md`, `.gitignore`, `.editorconfig`, `docs/AGENTE.md`, `CLAUDE.md` | Compartidos: se cambian solo con acuerdo del equipo |
 | `design/` | Nadie. Solo lectura |
 
 Excepción: si DevOps necesita una dependencia en `front/package.json` (por ejemplo Axios), la agrega en el sprint 0 antes de que front empiece, y lo avisa.

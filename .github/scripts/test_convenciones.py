@@ -78,6 +78,12 @@ class Revisar(unittest.TestCase):
         res = pr(archivos=("design/CEDIS Flow/tokens.css",), etiquetas=("diseno-autorizado",))
         self.assertEqual(res.errores, [])
 
+    def test_buzones_de_avisos_abiertos(self):
+        self.assertEqual(dueno("docs/AVISOS-back.md"), "buzon")
+        res = pr(archivos=("docs/AVISOS-back.md", "docs/AVISOS-devops.md"))
+        self.assertEqual(res.errores, [])
+        self.assertEqual(res.avisos, [])
+
     def test_compartido_es_aviso(self):
         res = pr(archivos=("README.md",))
         self.assertEqual(res.errores, [])

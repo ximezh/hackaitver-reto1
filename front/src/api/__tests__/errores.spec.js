@@ -52,3 +52,16 @@ describe('normalizarError', () => {
     expect(e.message).toBe('Ocurrió un error en el servidor')
   })
 })
+
+describe('normalizarError con el formato del contrato', () => {
+  it('lee campos de un error de validación del back', () => {
+    const e = normalizarError({
+      response: {
+        status: 422,
+        data: { detail: 'Completa SKU', code: 'validacion', campos: { sku: 'Completa SKU' } },
+      },
+    })
+    expect(e).toMatchObject({ codigo: 'validacion', message: 'Completa SKU' })
+    expect(e.campos).toEqual({ sku: 'Completa SKU' })
+  })
+})

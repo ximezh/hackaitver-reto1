@@ -2,27 +2,35 @@
  * Cliente HTTP de la app. Las vistas y stores no importan Axios: usan los servicios de `@/api`.
  *
  * - Base `/api`: en desarrollo la reenvía Vite (VITE_API_PROXY) y en producción Nginx.
- * - Agrega el token de sesión a cada petición.
- * - Un 401 avisa a la app para que cierre la sesión.
+ * - Agrega el token de sesión guardado (`./sesion.js`) a cada petición.
+ * - Sesión vencida o sin token (`401 no_autenticado` · `token_expirado`): avisa a la app para
+ *   que regrese al login. Un `401 credenciales_invalidas` del login no cierra nada.
+ * - Contraseña temporal (`403 cambio_contrasena_requerido`): avisa a la app para que lleve al
+ *   cambio de contraseña (R-17).
  * - Todos los errores llegan como `ErrorApi` (`./errores.js`).
  * - Con `VITE_API_MOCK=true` responde con los mocks de `./mocks`, sin red.
  */
 import axios from 'axios'
 
 import { normalizarError } from './errores.js'
+import { borrarToken, obtenerToken } from './sesion.js'
+
+const SESION_INVALIDA = new Set(['no_autenticado', 'token_expirado'])
 
 const opciones = {
-  obtenerToken: () => null,
+  obtenerToken,
   alNoAutorizado: () => {},
+  alCambioContrasena: () => {},
 }
 
 /**
- * La app indica cómo leer el token y qué hacer si la sesión ya no es válida.
- * Se llama una vez al iniciar (lo usa el store de sesión).
+ * La app indica qué hacer cuando la sesión deja de servir o la contraseña es temporal.
+ * Se llama una vez al iniciar (lo usa el store de sesión). `obtenerToken` solo se cambia en pruebas.
  */
-export function configurarHttp({ obtenerToken, alNoAutorizado } = {}) {
+export function configurarHttp({ obtenerToken, alNoAutorizado, alCambioContrasena } = {}) {
   if (obtenerToken) opciones.obtenerToken = obtenerToken
   if (alNoAutorizado) opciones.alNoAutorizado = alNoAutorizado
+  if (alCambioContrasena) opciones.alCambioContrasena = alCambioContrasena
 }
 
 export function usaMocks() {
@@ -64,7 +72,12 @@ export function crearHttp({ adapter } = {}) {
     (respuesta) => respuesta,
     (error) => {
       const errorApi = normalizarError(error)
-      if (errorApi.estado === 401) opciones.alNoAutorizado(errorApi)
+      if (errorApi.estado === 401 && SESION_INVALIDA.has(errorApi.codigo)) {
+        borrarToken()
+        opciones.alNoAutorizado(errorApi)
+      } else if (errorApi.codigo === 'cambio_contrasena_requerido') {
+        opciones.alCambioContrasena(errorApi)
+      }
       return Promise.reject(errorApi)
     },
   )

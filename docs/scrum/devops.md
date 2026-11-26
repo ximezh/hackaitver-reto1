@@ -175,14 +175,16 @@ Como equipo queremos detectar en CI si una pantalla se aleja del prototipo.
 
 | ID | Historia | Origen |
 |---|---|---|
-| — | Sin historias todavía | — |
+| DO-12b | Crear la instancia en AWS con `infra/aws/crear-instancia.sh`, apuntar el DNS y cargar los `.env` reales | Falta cuenta, región y dominio (S-05) |
+| DO-13b | Activar los timers de despliegue en la instancia y marcar como públicos los paquetes de GHCR | Depende de DO-12b |
+| DO-14b | Correr la prueba de contrato contra el back real en local, staging y producción, y probar el login desde un teléfono | Depende de BE-10…14 y de DO-12b |
 
 ## Avance
 
 | Sprint | Estado | PR |
 |---|---|---|
 | 0 | Hecho: DO-01…06 | `devops-ci/sprint0` |
-| 1 | Pendiente | — |
+| 1 | Parcial: DO-10 y DO-11 hechos; DO-12 y DO-13 listos y probados en local con Podman, falta crear la instancia (DO-12b, DO-13b); DO-14 con la prueba de contrato lista, bloqueado por BE-10…14 y la instancia (DO-14b). Issues #5, #7 y #8 resueltos | `devops-feat/sprint1` |
 | 2 | Pendiente | — |
 | 3 | Pendiente | — |
 | 4 | Pendiente | — |

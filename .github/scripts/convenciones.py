@@ -44,7 +44,11 @@ DUENOS = (
     ("docs/scrum/back.md", "back"),
     ("front/", "front"),
     ("docs/scrum/front.md", "front"),
+    ("docs/AVISOS-front.md", "buzon"),
+    ("docs/AVISOS-back.md", "buzon"),
+    ("docs/AVISOS-devops.md", "buzon"),
     ("docs/scrum.md", "compartido"),
+    ("docs/AVISOS.md", "compartido"),
     ("docs/AGENTE.md", "compartido"),
     ("CLAUDE.md", "compartido"),
     ("README.md", "compartido"),
@@ -98,7 +102,8 @@ def revisar_archivos(
 ) -> None:
     for ruta in archivos:
         d = dueno(ruta)
-        if d == area:
+        # Los buzones de avisos (docs/AVISOS.md) los escribe cualquier área.
+        if d in (area, "buzon"):
             continue
         if d == "diseno":
             if ETIQUETA_DISENO not in etiquetas:

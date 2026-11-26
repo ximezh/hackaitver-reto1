@@ -1,7 +1,8 @@
 /**
  * Error de la API con una forma única para todas las pantallas.
- * El back responde `{ detail, code }` (BE-04). FastAPI responde los errores de validación
- * con `detail` como lista; se juntan en un solo mensaje y se guardan por campo.
+ * El back responde `{ detail, code }` y, en validación, `campos` (docs/api/README.md). Si llega
+ * el formato por defecto de FastAPI (`detail` como lista), se junta igual por campo.
+ * Las pantallas deciden con `codigo`, nunca con el mensaje.
  */
 export class ErrorApi extends Error {
   constructor({ estado, codigo, mensaje, campos = {} }) {
@@ -46,5 +47,7 @@ export function normalizarError(error) {
 
   const codigo = data?.code ?? (status >= 500 ? 'error_servidor' : `http_${status}`)
   const mensaje = data?.detail ?? MENSAJES.error_servidor
-  return new ErrorApi({ estado: status, codigo, mensaje })
+  // Validación del back (contrato, docs/api/README.md): `campos` trae el mensaje de cada campo.
+  const campos = data?.campos && typeof data.campos === 'object' ? data.campos : {}
+  return new ErrorApi({ estado: status, codigo, mensaje, campos })
 }
