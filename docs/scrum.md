@@ -266,7 +266,7 @@ Cada archivo tiene un solo dueño. Un agente no edita archivos de otra área.
 | `back/` (código, migraciones, pruebas, `pyproject.toml`, `.env.example`) | Back |
 | `compose.yaml` (PostgreSQL en Podman para desarrollo) | Back |
 | `docs/api/` (contratos de API) | Back |
-| `.github/`, `infra/`, `tools/`, `Dockerfile` de front y back | DevOps |
+| `.github/`, `infra/`, `tools/`, `Dockerfile` y `.dockerignore` de front y back, `front/nginx.conf.template` | DevOps |
 | `docs/scrum/front.md`, `back.md`, `devops.md` | El área de cada archivo |
 | `docs/scrum.md`, `README.md`, `.gitignore`, `.editorconfig`, `docs/AGENTE.md`, `CLAUDE.md` | Compartidos: se cambian solo con acuerdo del equipo |
 | `design/` | Nadie. Solo lectura |

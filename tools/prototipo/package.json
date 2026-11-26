@@ -1,0 +1,13 @@
+{
+  "name": "visor-prototipo",
+  "private": true,
+  "type": "module",
+  "description": "Visor local de design/CEDIS Flow, sin dependencias",
+  "scripts": {
+    "prototipo": "node visor.mjs",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=22.18"
+  }
+}

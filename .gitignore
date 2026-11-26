@@ -2,6 +2,7 @@
 .env
 .env.*
 !.env.example
+infra/entornos/*.env
 *.pem
 *.key
 
