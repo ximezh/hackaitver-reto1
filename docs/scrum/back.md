@@ -258,8 +258,8 @@ Como usuario quiero recibir avisos de lo que pasa con mis entregas, pedidos y an
 | Sprint | Estado | PR |
 |---|---|---|
 | 0 | Hecho | #6 |
-| 1 | En revisión | #12 |
-| 2 | Pendiente | — |
+| 1 | Hecho | #12 |
+| 2 | En revisión | #22 |
 | 3 | Pendiente | — |
 | 4 | Pendiente | — |
 | 5 | Pendiente | — |
