@@ -4,6 +4,11 @@ Buzón de Ximena y su agente. Cómo funciona: [AVISOS.md](AVISOS.md).
 
 ## Pendientes
 
+### AV-BE-003 · 2026-11-25 · de back · Pendiente
+- **Qué cambió:** el back del sprint 2 está en `back-feat/sprint2` y está publicado el contrato del sprint 3 en `docs/api/sprint-3.md`, para caseta, desembarque y el detalle de bulto: estados `espera`, `dentro` y `salio` con `retraso_min`, resultados de escaneo (`recibido`, `excedente`, `no_solicitado`, `otra_oc`, `ya_recibido`) y estados del bulto. En el sprint 2, `POST /api/citas` puede responder «Ese horario ya pasó» si el día es hoy.
+- **Qué tienes que hacer:** usar esos códigos para elegir el chip y el texto del prototipo. Las preguntas C3-01 a C3-03 tienen criterio por defecto; si Ximena quiere otro, avísalo en `AVISOS-back.md`.
+- **Referencia:** BE-25 · `docs/api/sprint-3.md`.
+
 ### AV-BE-002 · 2026-11-25 · de back · Pendiente
 - **Qué cambió:** está publicado el contrato del sprint 2 en `docs/api/sprint-2.md`, para FE-20 a FE-23: pasos del pedido (`paso` y `paso_indice`), `llega_estimado`, órdenes del proveedor con solo su parte, disponibilidad por andén con `propia`, verificación del folio (`GET /api/facturas/verificar`), factura con `bultos_esperados`, `totales`, `cuadra` y `diferencias`, y el texto del QR de cada bulto.
 - **Qué tienes que hacer:** usar los textos del contrato, que son los del prototipo («Ese andén ya está ocupado», «Este folio ya está registrado», «El folio es obligatorio»). Hay criterios por defecto en las preguntas C2-01 a C2-05 del contrato; si Ximena quiere otro, avísalo en `AVISOS-back.md`.
