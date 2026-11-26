@@ -87,7 +87,12 @@ class PedidoSalida(BaseModel):
 
 def cita_de(parte: ParteOc) -> CitaResumen | None:
     """La cita de la parte, si ya tiene (BE-22)."""
-    return None
+    if parte.cita is None:
+        return None
+    from app.pedidos.citas import horario  # evita el ciclo citas → proveedor → pedidos
+
+    dia, inicio, fin = horario(parte.cita)
+    return CitaResumen(anden=parte.cita.anden.clave, dia=dia, inicio=inicio, fin=fin)
 
 
 def pedido_salida(oc: OrdenCompra) -> PedidoSalida:
@@ -138,6 +143,7 @@ def _con_detalle():
     return select(OrdenCompra).options(
         selectinload(OrdenCompra.sucursal),
         selectinload(OrdenCompra.partes).selectinload(ParteOc.proveedor),
+        selectinload(OrdenCompra.partes).selectinload(ParteOc.cita),
         selectinload(OrdenCompra.partes)
         .selectinload(ParteOc.lineas)
         .selectinload(LineaOc.producto),

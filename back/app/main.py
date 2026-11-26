@@ -5,7 +5,7 @@ from app import errores
 from app.auth.router import router as auth
 from app.catalogos import productos, proveedores, sucursales, usuarios
 from app.config import get_settings
-from app.pedidos import pedidos, proveedor
+from app.pedidos import citas, facturas, pedidos, proveedor
 from app.routers import health
 
 
@@ -28,6 +28,8 @@ def create_app() -> FastAPI:
     app.include_router(usuarios.router, prefix="/api")
     app.include_router(pedidos.router, prefix="/api")
     app.include_router(proveedor.router, prefix="/api")
+    app.include_router(citas.router, prefix="/api")
+    app.include_router(facturas.router, prefix="/api")
     return app
 
 

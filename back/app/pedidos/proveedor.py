@@ -18,7 +18,7 @@ from app.errores import NO_ENCONTRADO, error
 from app.models import LineaOc, OrdenCompra, ParteOc, Usuario
 from app.models.comun import Rol
 from app.pedidos.esquemas import M3, Kg, ProductoConMedidas, SucursalResumen, redondear
-from app.tiempo import FechaHora
+from app.tiempo import FechaHora, a_local
 
 router = APIRouter(prefix="/proveedor", tags=["proveedor"])
 Proveedor = Annotated[Usuario, Depends(requiere_rol(Rol.PROVEEDOR))]
@@ -57,13 +57,30 @@ class OrdenDelProveedor(BaseModel):
 
 
 def cita_de_la_parte(parte: ParteOc) -> CitaDeLaParte | None:
-    """Se completa en BE-22."""
-    return None
+    if parte.cita is None:
+        return None
+    inicio, fin = a_local(parte.cita.inicio), a_local(parte.cita.fin)
+    return CitaDeLaParte(
+        id=parte.cita.id,
+        anden=parte.cita.anden.clave,
+        dia=inicio.date(),
+        inicio=f"{inicio:%H:%M}",
+        fin=f"{fin:%H:%M}",
+        estado=parte.cita.estado,
+    )
+
+
+def bultos_capturados(factura: object) -> int:
+    """Se completa en BE-23, cuando la factura tiene bultos."""
+    return 0
 
 
 def factura_de_la_parte(parte: ParteOc) -> FacturaDeLaParte | None:
-    """Se completa en BE-22 y BE-23."""
-    return None
+    if parte.factura is None:
+        return None
+    return FacturaDeLaParte(
+        folio=parte.factura.folio, bultos_capturados=bultos_capturados(parte.factura)
+    )
 
 
 def orden_del_proveedor(parte: ParteOc) -> OrdenDelProveedor:
@@ -100,6 +117,8 @@ def partes_del_proveedor(session: Session, proveedor_id: int):
         .options(
             selectinload(ParteOc.oc).selectinload(OrdenCompra.sucursal),
             selectinload(ParteOc.lineas).selectinload(LineaOc.producto),
+            selectinload(ParteOc.cita),
+            selectinload(ParteOc.factura),
         )
     )
 
