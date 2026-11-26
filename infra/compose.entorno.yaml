@@ -4,6 +4,8 @@
 #   podman compose -f compose.entorno.yaml --env-file entornos/produccion.env up -d
 #
 # El archivo de entorno define ENTORNO, las imágenes y los secretos (ver entornos/*.env.example).
+# Las variables del back se pasan una por una para que el compose funcione desde cualquier carpeta:
+# el despliegue (actualizar.sh) lo toma de la versión que publica.
 # Caddy (compose.borde.yaml) llega al front por la red compartida `reto1-borde`.
 name: reto1-${ENTORNO:?Falta ENTORNO}
 
@@ -25,8 +27,10 @@ services:
 
   back:
     image: ${IMAGEN_BACK:?Falta IMAGEN_BACK}
-    env_file:
-      - entornos/${ENTORNO}.env
+    environment:
+      APP_ENV: ${APP_ENV:-production}
+      DATABASE_URL: ${DATABASE_URL:?Falta DATABASE_URL}
+      CORS_ORIGINS: ${CORS_ORIGINS:?Falta CORS_ORIGINS}
     depends_on:
       db:
         condition: service_healthy

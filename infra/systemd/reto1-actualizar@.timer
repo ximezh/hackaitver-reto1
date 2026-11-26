@@ -1,0 +1,11 @@
+# Revisa cada minuto si hay una versión nueva de un entorno.
+[Unit]
+Description=CEDIS Flow · revisar versión nueva de %i
+
+[Timer]
+OnBootSec=1min
+OnUnitActiveSec=1min
+Persistent=true
+
+[Install]
+WantedBy=timers.target

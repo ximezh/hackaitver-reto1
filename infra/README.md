@@ -52,7 +52,29 @@ chmod 600 entornos/*.env
 podman compose -f compose.borde.yaml --env-file entornos/borde.env up -d
 ```
 
-Los entornos los levanta el despliegue continuo (DO-13).
+Los entornos los levanta el despliegue continuo.
+
+## Despliegue continuo
+
+`main` es producción y `dev` es staging (A-15). Nadie despliega a mano:
+
+1. Un merge a `dev` o `main` corre el CI. Si pasa, el workflow [Publicar](../.github/workflows/publicar.yml) sube a GHCR las imágenes `ghcr.io/ximezh/hackaitver-reto1-back` y `-front` con la etiqueta `sha-<commit>`.
+2. En la instancia, un timer corre [actualizar.sh](actualizar.sh) cada minuto por entorno. Si la rama avanzó y ya están sus imágenes, corre las migraciones, levanta la versión nueva y revisa `/api/health` a través de Nginx.
+3. Si la versión nueva no responde, vuelve a levantar la anterior y no reintenta ese commit; el siguiente commit sí se intenta. Si el CI falló, las imágenes nunca se publican y el entorno no cambia.
+
+Activarlo en la instancia, una sola vez:
+
+```bash
+mkdir -p ~/.config/systemd/user
+ln -sf ~/reto1/infra/systemd/reto1-actualizar@.service ~/reto1/infra/systemd/reto1-actualizar@.timer ~/.config/systemd/user/
+systemctl --user daemon-reload
+systemctl --user enable --now reto1-actualizar@produccion.timer reto1-actualizar@staging.timer
+journalctl --user -u 'reto1-actualizar@*' -f     # ver los despliegues
+```
+
+- La primera vez que se publica, GHCR crea los paquetes como privados. Hay que marcarlos como públicos en GitHub (Packages → configuración del paquete), igual que el repositorio, para que la instancia los descargue sin credenciales.
+- Las migraciones no se revierten al volver a la versión anterior: cada migración debe ser compatible con la versión previa del back.
+- El script y el `Caddyfile` se leen del clon en `~/reto1`; para actualizarlos: `git -C ~/reto1 pull`.
 
 ## Probar en local
 
