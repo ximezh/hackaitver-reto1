@@ -1,5 +1,6 @@
 import './styles/fonts.css'
 import './styles/tokens.css'
+import './styles/bundle.css'
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
