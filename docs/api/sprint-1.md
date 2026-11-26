@@ -269,6 +269,10 @@ El prototipo no dice qué proveedor surte cada producto. La asignación de los e
 | 422 | `validacion` | Las piezas por bulto deben ser mayores a 0 | `piezas_por_bulto` ≤ 0 |
 | 422 | `validacion` | El peso debe ser mayor a 0 | `kg` ≤ 0 |
 | 422 | `validacion` | El volumen debe ser mayor a 0 | `m3` ≤ 0 |
+| 422 | `validacion` | El peso no puede pasar de 1,000 kg, la capacidad de una tarima | `kg` > 1000 (R-09) |
+| 422 | `validacion` | El volumen no puede pasar de 2.576 m³, la capacidad de una tarima | `m3` > 2.576 (R-09) |
+| 422 | `validacion` | El SKU no es válido | SKU con otro formato |
+| 422 | `validacion` | La ilustración no es válida | `ilustracion` fuera de la lista |
 | 422 | `validacion` | El proveedor no existe | `proveedor_id` no existe |
 
 ### Proveedores · `/api/proveedores`

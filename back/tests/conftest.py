@@ -73,7 +73,11 @@ def api(db: Session) -> TestClient:
     app = create_app()
 
     def sesion() -> Iterator[Session]:
-        yield db
+        try:
+            yield db
+        except Exception:
+            db.rollback()  # como `get_session`: deshace solo el savepoint de esta petición
+            raise
 
     app.dependency_overrides[get_session] = sesion
     return TestClient(app, raise_server_exceptions=False)
@@ -85,6 +89,9 @@ def semillas(db: Session) -> None:
     from app.seeds import cargar
 
     cargar(db)
+    # Fija las semillas en la transacción de la prueba: un `rollback` de una petición
+    # (por ejemplo, tras un SKU duplicado) solo deshace lo de esa petición.
+    db.commit()
 
 
 CANAL_DE_PRUEBA = {"caseta.": "android", "desem.": "android", "embar.": "android"}
