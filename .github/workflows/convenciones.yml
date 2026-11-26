@@ -1,0 +1,38 @@
+# Revisa rama, título, commits y archivos de cada PR (docs/scrum.md · Coordinación entre áreas).
+name: Convenciones
+
+on:
+  pull_request:
+    branches: [dev, main]
+    types: [opened, edited, synchronize, reopened, labeled, unlabeled]
+
+concurrency:
+  group: convenciones-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  convenciones:
+    name: convenciones
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Pruebas del revisor
+        working-directory: .github/scripts
+        run: python -m unittest -v test_convenciones.py
+      - name: Revisar el PR
+        env:
+          PR_BASE: ${{ github.event.pull_request.base.ref }}
+          PR_HEAD: ${{ github.event.pull_request.head.ref }}
+          PR_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_TITULO: ${{ github.event.pull_request.title }}
+          PR_ETIQUETAS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
+        run: python .github/scripts/convenciones.py
