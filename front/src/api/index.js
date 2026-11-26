@@ -5,3 +5,11 @@ export { obtenerSalud } from './salud.js'
 export { cambiarContrasena, cerrarSesion, haySesion, iniciarSesion, obtenerPerfil } from './auth.js'
 export { ESTADOS, ROLES, productos, proveedores, sucursales, usuarios } from './catalogos.js'
 export { obtenerIndicadoresOficina } from './indicadores.js'
+export {
+  ANDENES_RECIBO,
+  DURACIONES_CITA,
+  PASOS_PEDIDO,
+  citas,
+  ordenesProveedor,
+  pedidos,
+} from './pedidos.js'
