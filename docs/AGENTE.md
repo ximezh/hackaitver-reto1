@@ -14,6 +14,18 @@ El equipo son tres desarrolladores, cada uno con su agente. Al iniciar una sesi�
 
 El plan general (reglas de negocio, decisiones, hallazgos, preguntas, DoR y DoD) está en [scrum.md](scrum.md).
 
+### Revisa los avisos de tu área
+
+Antes de cualquier otra cosa, y antes de cada tarea, revisa el buzón de tu área: `docs/AVISOS-front.md`, `docs/AVISOS-back.md` o `docs/AVISOS-devops.md` ([cómo funciona](AVISOS.md)).
+
+```bash
+git fetch origin
+git log --oneline -5 origin/dev -- docs/AVISOS-<área>.md   # ¿trae cambios?
+git show origin/dev:docs/AVISOS-<área>.md                  # leerlo
+```
+
+Si trae avisos `Pendiente`, resúmelos al usuario antes de seguir. Atiéndelos o anótalos en el backlog de tu plan, y márcalos `Atendido` en un commit `docs(<área>): atiende avisos …`.
+
 ## 2. Regla del prototipo
 
 **El diseño del prototipo no se modifica.** La interfaz debe ser idéntica a `design/CEDIS Flow/`.
@@ -29,6 +41,7 @@ El plan general (reglas de negocio, decisiones, hallazgos, preguntas, DoR y DoD)
 
 - Edita solo los archivos de tu área según la tabla «Propiedad de archivos» de `scrum.md`.
 - Si necesitas algo de otra área, no lo hagas tú: abre un issue con la etiqueta del área (`front`, `back`, `devops`) y la historia que lo necesita.
+- **Avisa lo que afecta a otra área.** Si tu cambio toca un contrato, una dependencia, una variable de entorno, un mock, el CI o algo que otra área esperaba, deja un aviso en su buzón (`docs/AVISOS-<área>.md`) en el mismo commit, con el formato de [AVISOS.md](AVISOS.md). Puedes escribir en el buzón de otra área, pero solo agregar avisos: el estado lo cambia su dueña.
 - **Contrato primero:** el back publica los contratos en `docs/api/`; DevOps crea los servicios y mocks en `front/src/api/`; el front consume solo `@/api`.
 - Lo que surja a mitad de sprint va al backlog de tu plan, no al sprint en curso.
 
