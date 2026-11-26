@@ -47,8 +47,30 @@ cd back
 cp .env.example .env
 uv sync
 uv run alembic upgrade head
+uv run python -m app.seeds
 uv run fastapi dev app/main.py
 ```
+
+## Semillas
+
+`uv run python -m app.seeds` carga los datos de ejemplo del prototipo:
+
+- 7 productos, 4 proveedores y 6 sucursales;
+- 6 usuarios de demostración;
+- los 7 andenes y los 32 racks.
+
+- Es idempotente: solo agrega lo que falta y no sobrescribe lo que Oficina haya editado.
+- Los usuarios de demostración tienen la contraseña `cedis2026` y no tienen que cambiarla al entrar. Para usar otra: `--contrasena <otra>`.
+- Con `APP_ENV=production` no corre, salvo que se agregue `--permitir-produccion`.
+
+| Usuario | Rol | Canal |
+|---|---|---|
+| `caseta.jlopez` | Caseta | Android |
+| `desem.mruiz` | Sup. desembarque | Android |
+| `embar.acruz` | Sup. embarque | Android |
+| `suc07` | Sucursal (Suc. 07 Boca del Río) | Web |
+| `pgolfo` | Proveedor (Papelera del Golfo) | Web |
+| `admin.cedis` | Oficina (Ana Domínguez) | Web |
 
 ## Pruebas
 

@@ -5,6 +5,7 @@ description = "API del reto 1 de HackAITver"
 requires-python = ">=3.13,<3.14"
 dependencies = [
     "alembic>=1.20.1",
+    "argon2-cffi>=25.1.0",
     "fastapi[standard]>=0.165.0",
     "psycopg[binary]>=3.3.9",
     "pydantic-settings>=2.16.3",
