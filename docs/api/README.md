@@ -5,7 +5,7 @@ Contratos que publica el back para que DevOps arme los servicios y mocks de `fro
 | Sprint | Contrato | Contenido |
 |---|---|---|
 | 1 | [sprint-1.md](sprint-1.md) | Login, sesión, contraseña temporal y CRUD de productos, proveedores, sucursales y usuarios |
-| 2 | `sprint-2.md` (BE-16) | Pedidos, OC, citas, disponibilidad, facturas, bultos y etiquetas |
+| 2 | [sprint-2.md](sprint-2.md) | Pedidos, OC, citas, disponibilidad, facturas, bultos y etiquetas |
 
 Si un contrato cambia después de publicarse, el back abre un issue con las etiquetas `front` y `devops`.
 

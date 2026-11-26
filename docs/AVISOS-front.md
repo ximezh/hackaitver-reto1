@@ -4,10 +4,15 @@ Buzón de Ximena y su agente. Cómo funciona: [AVISOS.md](AVISOS.md).
 
 ## Pendientes
 
-### AV-DO-009 · 2026-11-25 · de devops · Pendiente
-- **Qué cambió:** el CEDIS está en la Ciudad de México, no en Veracruz (issue #13). Es un cambio de diseño autorizado por Luis Daniel y ya está en la tabla de `docs/scrum.md`: el chip del login móvil dice **«CEDIS CDMX»**, no «CEDIS Veracruz» como en `design/CEDIS Flow/components/LoginMovil/preview.html`.
-- **Qué tienes que hacer:** usar «CEDIS CDMX» en LoginMovil (FE-11) y corregir el criterio de FE-11 en `docs/scrum/front.md`, que todavía dice «CEDIS Veracruz». Las sucursales y el resto del prototipo no cambian. Comenta en el issue #13 cuando quede.
-- **Referencia:** issue #13 · `docs/scrum.md` (Cambios de diseño autorizados, S-06).
+### AV-BE-002 · 2026-11-25 · de back · Pendiente
+- **Qué cambió:** está publicado el contrato del sprint 2 en `docs/api/sprint-2.md`, para FE-20 a FE-23: pasos del pedido (`paso` y `paso_indice`), `llega_estimado`, órdenes del proveedor con solo su parte, disponibilidad por andén con `propia`, verificación del folio (`GET /api/facturas/verificar`), factura con `bultos_esperados`, `totales`, `cuadra` y `diferencias`, y el texto del QR de cada bulto.
+- **Qué tienes que hacer:** usar los textos del contrato, que son los del prototipo («Ese andén ya está ocupado», «Este folio ya está registrado», «El folio es obligatorio»). Hay criterios por defecto en las preguntas C2-01 a C2-05 del contrato; si Ximena quiere otro, avísalo en `AVISOS-back.md`.
+- **Referencia:** BE-16 · `docs/api/sprint-2.md`.
+
+### AV-BE-001 · 2026-11-25 · de back · Pendiente
+- **Qué cambió:** el contrato del sprint 1 sumó mensajes de error: productos con más de 1,000 kg o 2.576 m³ (capacidad de una tarima, R-09), SKU o ilustración inválidos, `409 no_puedes_cambiar_tu_rol` cuando Oficina cambia su propio rol, y el formato del usuario. Ningún `code` ni campo existente cambió.
+- **Qué tienes que hacer:** nada si muestras `error.message` y `error.campos` tal cual (AV-DO-002).
+- **Referencia:** BE-11, BE-14 · `docs/api/sprint-1.md`.
 
 ### AV-DO-006 · 2026-11-25 · de devops · Pendiente
 - **Qué cambió:** están listos los servicios de Oficina en `@/api`: `productos`, `proveedores`, `sucursales` y `usuarios`, cada uno con `listar({ q })`, `obtener(id)`, `crear(datos)`, `editar(id, cambios)` y `eliminar(id)`; `usuarios.restablecer(id)`; `ROLES` y `ESTADOS` con etiqueta y chip; y `obtenerIndicadoresOficina()` con los valores del prototipo hasta BE-44. Los mocks aplican las reglas y textos del contrato del sprint 1.
