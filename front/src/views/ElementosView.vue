@@ -77,7 +77,9 @@ const opcionesSegmentado = [
       </div>
 
       <div class="card" style="grid-column: 1 / -1">
-        <div class="t-over" style="margin-bottom: 12px">Cajas de la tarima (por peso del bulto)</div>
+        <div class="t-over" style="margin-bottom: 12px">
+          Cajas de la tarima (por peso del bulto)
+        </div>
         <ZonasTarima />
       </div>
     </div>

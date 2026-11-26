@@ -1,5 +1,6 @@
 /* CEDIS Flow — generated from tokens.json */
-:root, [data-theme="light"] {
+:root,
+[data-theme='light'] {
   --brand-50: #eef4ff; /* Fondo de chips informativos, fila seleccionada, zona de carrusel. */
   --brand-100: #dbe7fd; /* Bordes de botones secundarios y anillos de enfoque suaves. */
   --brand-600: #1f5fd6; /* Color de marca: botón principal, enlaces, íconos activos. Texto blanco encima (5.1:1). */
@@ -20,8 +21,9 @@
   --pallet-light: #16884a; /* Caja verde: bultos ligeros (< 7 kg). Va arriba. */
   --kraft: #f1d9ae; /* Cartón de los bultos en ilustraciones. */
   --wood: #c99a62; /* Madera de la tarima en la vista 3D. */
-  --shadow-card: 0 1px 2px rgba(15,31,61,0.06), 0 4px 16px rgba(15,31,61,0.06); /* Tarjetas sobre surface-50. */
-  --shadow-pop: 0 8px 28px rgba(15,31,61,0.16); /* Hojas, modales y botón flotante de escaneo. */
+  --shadow-card:
+    0 1px 2px rgba(15, 31, 61, 0.06), 0 4px 16px rgba(15, 31, 61, 0.06); /* Tarjetas sobre surface-50. */
+  --shadow-pop: 0 8px 28px rgba(15, 31, 61, 0.16); /* Hojas, modales y botón flotante de escaneo. */
 }
 :root {
   --space-1: 4px; /* Ícono a texto. */

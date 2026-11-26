@@ -71,12 +71,7 @@ const varianteFinal = computed(() => props.variant || props.variante || 'primary
     :class="[varianteFinal, { sm: sm || pequeno, block: block || bloque }]"
     :disabled="disabled || deshabilitado"
   >
-    <Icono
-      v-if="icono"
-      :nombre="icono"
-      :tamano="iconoTamano ?? 20"
-      :grosor="iconoGrosor"
-    />
+    <Icono v-if="icono" :nombre="icono" :tamano="iconoTamano ?? 20" :grosor="iconoGrosor" />
     <slot />
     <Icono
       v-if="iconoDerecha"

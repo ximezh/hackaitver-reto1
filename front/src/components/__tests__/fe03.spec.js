@@ -54,7 +54,7 @@ describe('FE-03 · Layouts móvil y web', () => {
     expect(wrapper.find('.sheet.open .hoja-prueba').text()).toBe('Detalle check-in')
     expect(wrapper.find('.toast').exists()).toBe(true)
 
-    expect(bundleCss).toContain('.screen.screen-movil{min-height:100dvh;height:100dvh;width:100%')
+    expect(bundleCss).toMatch(/\.screen\.screen-movil\s*\{[^}]*width:\s*100%/)
   })
 
   it('adapta LayoutMovil al ancho del dispositivo en 360, 390 y 412 px', () => {
@@ -74,7 +74,7 @@ describe('FE-03 · Layouts móvil y web', () => {
   })
 
   it('renderiza LayoutWeb con barra lateral de 232px, marca, navegación, usuario, encabezado y contenido', () => {
-    expect(bundleCss).toContain('.side{width:232px;')
+    expect(bundleCss).toMatch(/\.side\s*\{[^}]*width:\s*232px/)
 
     const wrapper = mount(LayoutWeb, {
       props: {

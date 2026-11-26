@@ -103,18 +103,10 @@ const avisoIcono = computed(() => props.toastIcono ?? icono.value)
           >
             <Icono :nombre="item.icono || item.icon || 'box'" :tamano="20" />
             {{ item.etiqueta || item.label }}
-            <span
-              v-if="item.chip != null"
-              class="chip"
-              style="margin-left: auto; height: 22px"
-            >
+            <span v-if="item.chip != null" class="chip" style="margin-left: auto; height: 22px">
               {{ item.chip }}
             </span>
-            <span
-              v-else-if="item.conteo != null"
-              class="t-cap"
-              style="margin-left: auto"
-            >
+            <span v-else-if="item.conteo != null" class="t-cap" style="margin-left: auto">
               {{ item.conteo }}
             </span>
           </button>
