@@ -1,100 +1,90 @@
 # Infraestructura
 
-Lo mantiene DevOps. Todo corre en una instancia EC2 de AWS con Podman sin root (docs/scrum.md · A-14, A-15; issue #3).
+Lo mantiene DevOps. CEDIS Flow corre en una instancia EC2 de AWS con Podman sin root (docs/scrum.md · A-14, A-15; issue #3).
 
 ## Entornos
 
-| Entorno | Se publica desde | Dominio | Variables |
+| Entorno | Se publica desde | URL | Variables |
 |---|---|---|---|
 | Local | — | `http://localhost:5173` | `back/.env` (de `back/.env.example`) |
-| Staging | `dev` | `https://staging.<dominio>` | [entornos/staging.env.example](entornos/staging.env.example) |
-| Producción | `main` | `https://<dominio>` | [entornos/produccion.env.example](entornos/produccion.env.example) |
+| Staging | `dev` | <https://staging.cedis.13-184-89-164.sslip.io> | [entornos/staging.env.example](entornos/staging.env.example) |
+| Producción | `main` | <https://cedis.13-184-89-164.sslip.io> | [entornos/produccion.env.example](entornos/produccion.env.example) |
 
-El dominio, la cuenta y la región de AWS quedan pendientes (supuesto S-05).
+Los dominios usan [sslip.io](https://sslip.io): resuelven a la IP de la instancia sin comprar dominio (supuesto S-05). Si se cambia de instancia o se compra un dominio, se cambian en [caddy/cedis.caddy](caddy/cedis.caddy) y en `CORS_ORIGINS` de cada entorno.
 
 ## Cómo está armada la instancia
 
+La instancia `13.184.89.164` (`us-east-2`) es **compartida con otros proyectos** (Tickets y SEVA). CEDIS Flow no toca sus servicios, contenedores ni puertos: corre con su propio usuario y solo agrega un `import` al Caddy del sistema.
+
 ```text
-Internet ──► Caddy :80/:443 (compose.borde.yaml, HTTPS automático)
-               ├─ <dominio>          ──► front-produccion ──► back ──► db  (proyecto reto1-produccion)
-               └─ staging.<dominio>  ──► front-staging    ──► back ──► db  (proyecto reto1-staging)
+Internet ──► Caddy del sistema :80/:443 (HTTPS automático, compartido)
+               ├─ cedis.…sslip.io          ──► 127.0.0.1:8180 front ──► back ──► db  (reto1-produccion)
+               ├─ staging.cedis.…sslip.io  ──► 127.0.0.1:8181 front ──► back ──► db  (reto1-staging)
+               └─ otros proyectos (sin cambios)
 ```
 
 | Archivo | Qué es |
 |---|---|
-| [aws/crear-instancia.sh](aws/crear-instancia.sh) | Crea la EC2 (Ubuntu 24.04, `t3.small`, disco cifrado de 30 GB), el grupo de seguridad y la IP fija |
-| [aws/cloud-init.yaml](aws/cloud-init.yaml) | Instala Podman y `docker-compose`, crea el usuario `cedis` y deja los contenedores corriendo al reiniciar |
-| [compose.borde.yaml](compose.borde.yaml) · [Caddyfile](Caddyfile) | Caddy: certificados de Let's Encrypt y un dominio por entorno |
-| [compose.entorno.yaml](compose.entorno.yaml) | Un entorno: PostgreSQL 17 con volumen propio, back y front |
-| `entornos/*.env.example` | Variables y secretos de cada entorno. Los `.env` reales solo viven en la instancia |
-
-**Grupo de seguridad:** 80 y 443 abiertos; 22 solo desde la IP de administración. La instancia se actualiza sola consultando el repositorio (DO-13), así que GitHub no necesita entrar por SSH ni guardar secretos de AWS.
+| [preparar-instancia.sh](preparar-instancia.sh) | Prepara la instancia, dedicada o compartida: Podman, Caddy, usuario `cedis`, clon del repositorio, secretos, Caddy y timers. Idempotente |
+| [caddy/cedis.caddy](caddy/cedis.caddy) | Los dos dominios de CEDIS Flow para el Caddy del sistema |
+| [compose.entorno.yaml](compose.entorno.yaml) | Un entorno: PostgreSQL 17 con volumen propio, back y front en `127.0.0.1:PUERTO_FRONT` |
+| [actualizar.sh](actualizar.sh) · [systemd/](systemd/) | Despliegue continuo de cada entorno |
+| `entornos/*.env.example` | Variables de cada entorno. Los `.env` reales, con secretos, solo viven en la instancia |
+| [aws/crear-instancia.sh](aws/crear-instancia.sh) · [aws/cloud-init.yaml](aws/cloud-init.yaml) | Solo para crear una instancia **dedicada** nueva; la actual ya existe |
 
 ## Primera puesta en marcha
 
-Requiere AWS CLI v2 con credenciales, un par de claves EC2 y el dominio.
+En la instancia, con el usuario `ubuntu` (tiene sudo):
 
 ```bash
-# 1. Crear la instancia (genera costos en la cuenta)
-REGION=<región> CLAVE=<par-de-claves> IP_ADMIN=<tu-ip> infra/aws/crear-instancia.sh
-
-# 2. DNS: registros A de <dominio> y staging.<dominio> hacia la IP que imprime el script
-
-# 3. En la instancia
-ssh cedis@<ip>
-cloud-init status --wait
-git clone https://github.com/ximezh/hackaitver-reto1.git ~/reto1
-cd ~/reto1/infra
-cp entornos/borde.env.example entornos/borde.env            # DOMINIO
-cp entornos/produccion.env.example entornos/produccion.env  # contraseñas largas y dominio
-cp entornos/staging.env.example entornos/staging.env
-python3 -c "import secrets; print(secrets.token_urlsafe(48))"  # un JWT_SECRET distinto por entorno
-chmod 600 entornos/*.env
-podman compose -f compose.borde.yaml --env-file entornos/borde.env up -d
+curl -fsSL https://raw.githubusercontent.com/ximezh/hackaitver-reto1/dev/infra/preparar-instancia.sh | ACTIVAR=1 bash
 ```
 
-Los entornos los levanta el despliegue continuo.
+El script:
 
-**Datos de demostración en staging.** Staging corre con `APP_ENV=production`, así que las semillas (BE-03) solo cargan con una bandera explícita (issue #5). Una vez desplegado:
+1. Instala lo que falte: Podman, Caddy y `docker-compose`, que es el proveedor de `podman compose`.
+2. Crea el usuario `cedis` con Podman sin root, sin depender del Docker de otros proyectos.
+3. Clona el repositorio en `/home/cedis/reto1`.
+4. Genera `entornos/produccion.env` y `staging.env` con contraseña de base y `JWT_SECRET` aleatorios y distintos (issue #8).
+5. Respalda `/etc/caddy/Caddyfile`, agrega `import /etc/caddy/cedis.caddy`, valida y recarga Caddy sin cortar los otros sitios. Si la validación falla, restaura el respaldo.
+6. Activa los timers de despliegue (`ACTIVAR=1`).
+
+**Datos de demostración.** Los entornos corren con `APP_ENV=production`, así que las semillas (BE-03) solo cargan con una bandera explícita (issue #5). Se cargan con una contraseña propia de la instancia, no la de desarrollo:
 
 ```bash
+sudo -iu cedis
 cd ~/reto1/infra
-podman compose -p reto1-staging run --rm back python -m app.seeds --permitir-produccion
+openssl rand -base64 18 > entornos/demo-staging.txt && chmod 600 entornos/demo-staging.txt
+podman compose -p reto1-staging run --rm back python -m app.seeds --permitir-produccion --contrasena "$(cat entornos/demo-staging.txt)"
 ```
-
-En producción no se cargan semillas.
 
 ## Despliegue continuo
 
 `main` es producción y `dev` es staging (A-15). Nadie despliega a mano:
 
-1. Un merge a `dev` o `main` corre el CI. Si pasa, el job «Publicar imágenes» de [ci.yml](../.github/workflows/ci.yml) sube a GHCR las imágenes `ghcr.io/ximezh/hackaitver-reto1-back` y `-front` con la etiqueta `sha-<commit>`.
+1. Un merge a `dev` o `main` corre el CI. Si pasa, el job «Publicar imágenes» de [ci.yml](../.github/workflows/ci.yml) sube a GHCR las imágenes `ghcr.io/ximezh/hackaitver-reto1-back` y `-front` con la etiqueta `sha-<commit>`. Los paquetes son públicos, como el repositorio.
 2. En la instancia, un timer corre [actualizar.sh](actualizar.sh) cada minuto por entorno. Si la rama avanzó y ya están sus imágenes, corre las migraciones, levanta la versión nueva y revisa `/api/health` a través de Nginx.
 3. Si la versión nueva no responde, vuelve a levantar la anterior y no reintenta ese commit; el siguiente commit sí se intenta. Si el CI falló, las imágenes nunca se publican y el entorno no cambia.
 
-Activarlo en la instancia, una sola vez:
-
 ```bash
-mkdir -p ~/.config/systemd/user
-ln -sf ~/reto1/infra/systemd/reto1-actualizar@.service ~/reto1/infra/systemd/reto1-actualizar@.timer ~/.config/systemd/user/
-systemctl --user daemon-reload
-systemctl --user enable --now reto1-actualizar@produccion.timer reto1-actualizar@staging.timer
-journalctl --user -u 'reto1-actualizar@*' -f     # ver los despliegues
+sudo -iu cedis
+systemctl --user list-timers 'reto1-*'
+journalctl --user -u 'reto1-actualizar@*' -f        # ver los despliegues
+cat ~/.local/state/reto1/staging/desplegado          # commit en staging
 ```
 
-- La primera vez que se publica, GHCR crea los paquetes como privados. Hay que marcarlos como públicos en GitHub (Packages → configuración del paquete), igual que el repositorio, para que la instancia los descargue sin credenciales.
 - Las migraciones no se revierten al volver a la versión anterior: cada migración debe ser compatible con la versión previa del back.
-- El script y el `Caddyfile` se leen del clon en `~/reto1`; para actualizarlos: `git -C ~/reto1 pull`.
+- El script y `cedis.caddy` se leen del clon en `~/reto1`; para actualizarlos: `git -C ~/reto1 pull` y, si cambió `cedis.caddy`, volver a correr `preparar-instancia.sh`.
 
 ## Probar en local
 
-La misma configuración corre en una laptop con Podman, con `DOMINIO=localhost` y puertos altos:
+La misma configuración corre en una laptop con Podman:
 
 ```bash
 cd infra
-DOMINIO=localhost PUERTO_HTTP=8088 PUERTO_HTTPS=8443 podman compose -f compose.borde.yaml up -d
+cp entornos/produccion.env.example entornos/produccion.env   # y llenar secretos
 podman compose -f compose.entorno.yaml --env-file entornos/produccion.env up -d
-curl -k https://localhost:8443/api/health
+curl http://127.0.0.1:8180/api/health
 ```
 
 ## CORS

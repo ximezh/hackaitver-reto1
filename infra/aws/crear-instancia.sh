@@ -70,7 +70,7 @@ cat <<EOF
 Instancia $instancia lista en $ip ($TIPO, $REGION).
 
 Siguientes pasos (infra/README.md · Primera puesta en marcha):
-  1. DNS: registros A de <dominio> y staging.<dominio> hacia $ip.
-  2. Esperar unos minutos a que termine cloud-init: ssh cedis@$ip cloud-init status --wait
-  3. Copiar los archivos de entorno y levantar Caddy.
+  1. Ajustar los dominios de infra/caddy/cedis.caddy y de entornos/*.env.example a la IP nueva
+     (patrón cedis.<ip-con-guiones>.sslip.io) o a un dominio propio.
+  2. ssh ubuntu@$ip 'cloud-init status --wait' y luego correr infra/preparar-instancia.sh ahí.
 EOF

@@ -6,7 +6,8 @@
 # El archivo de entorno define ENTORNO, las imágenes y los secretos (ver entornos/*.env.example).
 # Las variables del back se pasan una por una para que el compose funcione desde cualquier carpeta:
 # el despliegue (actualizar.sh) lo toma de la versión que publica.
-# Caddy (compose.borde.yaml) llega al front por la red compartida `reto1-borde`.
+# El front solo escucha en 127.0.0.1:PUERTO_FRONT; el Caddy del sistema le entrega el dominio
+# (infra/caddy/cedis.caddy). Así convive con otros proyectos de la instancia.
 name: reto1-${ENTORNO:?Falta ENTORNO}
 
 services:
@@ -43,17 +44,9 @@ services:
       BACK_URL: http://back:8000
     depends_on:
       - back
-    networks:
-      default:
-      borde:
-        aliases:
-          - front-${ENTORNO}
+    ports:
+      - "127.0.0.1:${PUERTO_FRONT:?Falta PUERTO_FRONT}:80"
     restart: unless-stopped
 
 volumes:
   datos:
-
-networks:
-  borde:
-    name: reto1-borde
-    external: true
