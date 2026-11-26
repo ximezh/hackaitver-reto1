@@ -10,13 +10,14 @@ from collections.abc import Iterator
 import pytest
 from alembic import command
 from alembic.config import Config
+from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import Session
 from sqlalchemy.pool import NullPool
 
 from app.config import BACK_DIR, get_settings
-from app.db import get_engine
+from app.db import get_engine, get_session
 from tests.base_de_pruebas import BaseDePruebasError, url_de_pruebas_del_entorno
 
 
@@ -62,3 +63,38 @@ def db() -> Iterator[Session]:
         finally:
             session.close()
             trans.rollback()
+
+
+@pytest.fixture
+def api(db: Session) -> TestClient:
+    """Cliente de la API que usa la sesión de la prueba: lo que guarda se deshace al final."""
+    from app.main import create_app  # se importa ya con la URL de pruebas
+
+    app = create_app()
+
+    def sesion() -> Iterator[Session]:
+        yield db
+
+    app.dependency_overrides[get_session] = sesion
+    return TestClient(app, raise_server_exceptions=False)
+
+
+@pytest.fixture
+def semillas(db: Session) -> None:
+    """Datos del prototipo (BE-03): usuarios de demostración con contraseña `cedis2026`."""
+    from app.seeds import cargar
+
+    cargar(db)
+
+
+CANAL_DE_PRUEBA = {"caseta.": "android", "desem.": "android", "embar.": "android"}
+
+
+def entrar(api: TestClient, usuario: str, contrasena: str = "cedis2026") -> dict[str, str]:
+    """Inicia sesión por el canal del usuario y devuelve el encabezado `Authorization`."""
+    canal = next((c for p, c in CANAL_DE_PRUEBA.items() if usuario.startswith(p)), "web")
+    r = api.post(
+        "/api/auth/login", json={"usuario": usuario, "contrasena": contrasena, "canal": canal}
+    )
+    assert r.status_code == 200, r.text
+    return {"Authorization": f"Bearer {r.json()['access_token']}"}

@@ -2,10 +2,11 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Literal
 
-from pydantic import field_validator
+from pydantic import field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BACK_DIR = Path(__file__).resolve().parent.parent
+JWT_SECRET_DESARROLLO = "solo-para-desarrollo-no-usar-en-produccion"
 
 
 def usar_psycopg(url: str) -> str:
@@ -27,11 +28,25 @@ class Settings(BaseSettings):
     app_env: Literal["development", "test", "production"] = "development"
     database_url: str
     cors_origins: list[str] = ["http://localhost:5173"]
+    # Firma de los JWT (A-09). En producción es obligatoria y larga; en desarrollo y pruebas
+    # se usa un valor fijo para no tener que configurarla.
+    jwt_secret: str = JWT_SECRET_DESARROLLO
 
     @field_validator("database_url")
     @classmethod
     def use_psycopg(cls, value: str) -> str:
         return usar_psycopg(value)
+
+    @model_validator(mode="after")
+    def secreto_en_produccion(self) -> "Settings":
+        if self.app_env == "production" and (
+            self.jwt_secret == JWT_SECRET_DESARROLLO or len(self.jwt_secret) < 32
+        ):
+            raise ValueError(
+                "En producción JWT_SECRET es obligatorio y debe tener al menos 32 caracteres. "
+                'Genera uno con: python -c "import secrets; print(secrets.token_urlsafe(48))"'
+            )
+        return self
 
 
 @lru_cache
