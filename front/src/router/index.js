@@ -10,6 +10,7 @@ import OficinaView from '../views/OficinaView.vue'
 import PortalMovilView from '../views/PortalMovilView.vue'
 import PortalWebView from '../views/PortalWebView.vue'
 import ProveedorView from '../views/ProveedorView.vue'
+import SucursalView from '../views/SucursalView.vue'
 
 export function crearRutas({ esDev = import.meta.env.DEV } = {}) {
   return [
@@ -61,6 +62,13 @@ export function crearRutas({ esDev = import.meta.env.DEV } = {}) {
       ],
     },
     {
+      // La vista trae su propio LayoutWeb con la navegación de la sucursal.
+      path: '/web/sucursal',
+      name: 'web-sucursal',
+      meta: { rol: 'sucursal', canal: 'web' },
+      component: SucursalView,
+    },
+    {
       // Vista con layout web propio (barra lateral del proveedor), fuera de LayoutWeb.
       path: '/web/proveedor',
       name: 'web-proveedor',
@@ -77,12 +85,6 @@ export function crearRutas({ esDev = import.meta.env.DEV } = {}) {
           name: 'web-oficina',
           meta: { rol: 'oficina', canal: 'web' },
           component: OficinaView,
-        },
-        {
-          path: 'sucursal',
-          name: 'web-sucursal',
-          meta: { rol: 'sucursal', canal: 'web' },
-          component: PortalWebView,
         },
         {
           path: ':ruta(.*)*',
