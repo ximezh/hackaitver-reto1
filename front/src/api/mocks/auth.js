@@ -1,10 +1,12 @@
 import { errorMock, registrarMock } from '../mock.js'
-import { usuarios } from './datos.js'
+import { db, usuarios } from './datos.js'
 
 const EXPIRA_EN = 43200
 
 /** Forma pública del usuario: la de `GET /api/auth/me`. */
 export function perfil(u) {
+  const s = db.sucursales.find((x) => x.id === u.sucursal_id)
+  const p = db.proveedores.find((x) => x.id === u.proveedor_id)
   return {
     id: u.id,
     usuario: u.usuario,
@@ -12,8 +14,8 @@ export function perfil(u) {
     rol: u.rol,
     canal: u.canal,
     contrasena_temporal: u.contrasena_temporal,
-    sucursal: u.sucursal,
-    proveedor: u.proveedor,
+    sucursal: s ? { id: s.id, clave: s.clave, nombre: s.nombre } : null,
+    proveedor: p ? { id: p.id, rfc: p.rfc, nombre: p.nombre } : null,
   }
 }
 
@@ -46,7 +48,7 @@ export function usuarioDeSesion(headers, { permitirTemporal = false } = {}) {
   return u
 }
 
-function validacion(detail, campos) {
+export function validacion(detail, campos) {
   const error = errorMock(422, detail, 'validacion')
   error.mock.datos.campos = campos
   return error

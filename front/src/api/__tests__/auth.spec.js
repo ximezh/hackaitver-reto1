@@ -157,10 +157,10 @@ describe('errores del back con campos', () => {
     const alCambioContrasena = vi.fn()
     configurarHttp({ alCambioContrasena })
     const { registrarMock, errorMock } = await import('../mock.js')
-    registrarMock('get', '/productos', () => {
+    registrarMock('get', '/prueba-temporal', () => {
       throw errorMock(403, 'Cambia tu contraseña para continuar', 'cambio_contrasena_requerido')
     })
-    await expect(http.get('/productos')).rejects.toMatchObject({
+    await expect(http.get('/prueba-temporal')).rejects.toMatchObject({
       codigo: 'cambio_contrasena_requerido',
     })
     expect(alCambioContrasena).toHaveBeenCalledOnce()
