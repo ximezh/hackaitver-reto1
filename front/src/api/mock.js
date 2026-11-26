@@ -87,6 +87,7 @@ export function crearAdaptadorMock({ latencia = 150 } = {}) {
         params: encontrado.params,
         query: config.params ?? {},
         body: cuerpo(config.data),
+        headers: config.headers ?? {},
       })
       const { estado, datos } = salida?.[RESPUESTA] ? salida : { estado: 200, datos: salida }
       if (estado >= 400) return rechazar(config, estado, datos)
