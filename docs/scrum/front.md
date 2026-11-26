@@ -265,7 +265,7 @@ Como supervisor quiero las pestañas Inicio, Tarimas e Historial para moverme en
 | Sprint | Estado | PR |
 |---|---|---|
 | 0 | Hecho: FE-01…05 | `front-chore/sprint0` |
-| 1 | Pendiente | — |
+| 1 | Hecho: FE-10…14 | `front-feat/sprint1` |
 | 2 | Pendiente | — |
 | 3 | Pendiente | — |
 | 4 | Pendiente | — |
