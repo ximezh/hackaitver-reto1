@@ -28,7 +28,9 @@ afterEach(() => {
 describe('permisos', () => {
   it('solo Oficina usa los catálogos', async () => {
     await iniciarSesion({ usuario: 'suc07', contrasena: CONTRASENA_DEMO, canal: 'web' })
-    await expect(productos.listar()).rejects.toMatchObject({ estado: 403, codigo: 'sin_permiso' })
+    await expect(proveedores.listar()).rejects.toMatchObject({ estado: 403, codigo: 'sin_permiso' })
+    // Sprint 2: Sucursal sí lista productos, solo los activos.
+    expect((await productos.listar()).total).toBe(7)
   })
 
   it('con contraseña temporal pide cambiarla', async () => {

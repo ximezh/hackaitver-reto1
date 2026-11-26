@@ -4,6 +4,11 @@ Buzón de Ximena y su agente. Cómo funciona: [AVISOS.md](AVISOS.md).
 
 ## Pendientes
 
+### AV-DO-011 · 2026-11-25 · de devops · Pendiente
+- **Qué cambió:** DO-20 listo en `@/api` para la ruta crítica: `pedidos.crear(lineas)`, `pedidos.listar({ enCurso })`, `pedidos.obtener(folio)`, `ordenesProveedor.listar({ sinCita })`, `citas.disponibilidad(dia)`, `citas.verificarFolio({ folio, oc })` y `citas.agendar({ oc, folio_factura, anden, dia, inicio, duracion_min })`, más `PASOS_PEDIDO`, `DURACIONES_CITA` y `ANDENES_RECIBO`. Los mocks aplican las reglas y textos del contrato del sprint 2 (empalmes, folio repetido, horario, días). Sucursal ya puede usar `productos.listar()`.
+- **Qué tienes que hacer:** usarlos en FE-20 (Pedir) y FE-22 (Agendar cita). Con `VITE_API_MOCK=true` funcionan sin back; la OC de ejemplo es `OC-26-1182` de `pgolfo`.
+- **Referencia:** DO-20 · `front/src/api/pedidos.js` · `docs/api/sprint-2.md`.
+
 ### AV-BE-002 · 2026-11-25 · de back · Pendiente
 - **Qué cambió:** está publicado el contrato del sprint 2 en `docs/api/sprint-2.md`, para FE-20 a FE-23: pasos del pedido (`paso` y `paso_indice`), `llega_estimado`, órdenes del proveedor con solo su parte, disponibilidad por andén con `propia`, verificación del folio (`GET /api/facturas/verificar`), factura con `bultos_esperados`, `totales`, `cuadra` y `diferencias`, y el texto del QR de cada bulto.
 - **Qué tienes que hacer:** usar los textos del contrato, que son los del prototipo («Ese andén ya está ocupado», «Este folio ya está registrado», «El folio es obligatorio»). Hay criterios por defecto en las preguntas C2-01 a C2-05 del contrato; si Ximena quiere otro, avísalo en `AVISOS-back.md`.
