@@ -8,6 +8,10 @@ Ninguno todavía.
 
 ## Atendidos
 
+### AV-DO-010 · 2026-11-25 · de devops · Atendido
+- **Qué cambió:** hay ruta crítica para la entrega (~45 min) al inicio de `docs/scrum.md`. Congelamiento de `dev` a los 30 minutos; después solo se corrigen errores que bloqueen la demo.
+- **Cómo se atendió:** BE-22 (citas sin empalmes) quedó lista y probada, junto con el resto del sprint 2 de back. El contrato del sprint 2 solo sumó «Ese horario ya pasó» (AV-BE-003 en `AVISOS-devops.md`); ningún `code` ni campo existente cambió.
+
 ### AV-DO-008 · 2026-11-25 · de devops · Atendido
 - **Qué cambió:** hay una prueba de contrato del sprint 1 contra el back real: salud, credenciales inválidas, canal incorrecto, login de Oficina, perfil, los cuatro catálogos, `403 sin_permiso` y `401 no_autenticado`. Hoy, contra `dev`, solo pasa la salud: las rutas de BE-10 a BE-14 responden `404 no_encontrado`.
 - **Cómo se atendió:** con BE-10 a BE-15 en `back-feat/sprint1`, las semillas cargadas y `API_REAL=http://localhost:8000`, `contrato.real.spec.js` pasa 7 de 7. Los errores que se sumaron al contrato están en AV-BE-001 de `AVISOS-devops.md`.

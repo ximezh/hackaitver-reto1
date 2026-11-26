@@ -168,7 +168,8 @@ jobs:
   publicar:
     name: Publicar imágenes
     needs: ci
-    if: github.event_name == 'push' && needs.ci.result == 'success'
+    # always(): si no, GitHub lo omite cuando algún job previo se omitió por no tener cambios.
+    if: always() && github.event_name == 'push' && needs.ci.result == 'success'
     runs-on: ubuntu-latest
     permissions:
       contents: read
