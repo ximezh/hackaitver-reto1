@@ -1,0 +1,31 @@
+# Entrada de la instancia: Caddy recibe el tráfico en 80 y 443, obtiene los certificados HTTPS
+# (Let's Encrypt) y reenvía cada dominio al front de su entorno.
+#
+#   DOMINIO=<dominio> podman compose -f compose.borde.yaml up -d
+#
+# Se levanta antes que los entornos porque crea la red `reto1-borde`.
+name: reto1-borde
+
+services:
+  caddy:
+    image: docker.io/library/caddy:2
+    environment:
+      DOMINIO: ${DOMINIO:?Falta DOMINIO}
+    ports:
+      - "${PUERTO_HTTP:-80}:80"
+      - "${PUERTO_HTTPS:-443}:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - certificados:/data
+      - configuracion:/config
+    networks:
+      - borde
+    restart: unless-stopped
+
+volumes:
+  certificados:
+  configuracion:
+
+networks:
+  borde:
+    name: reto1-borde

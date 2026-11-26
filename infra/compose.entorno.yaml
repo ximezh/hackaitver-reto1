@@ -1,0 +1,54 @@
+# Un entorno de la instancia (producción o staging): PostgreSQL, back y front.
+# Cada entorno es un proyecto aparte, con su propia base y su propio volumen.
+#
+#   podman compose -f compose.entorno.yaml --env-file entornos/produccion.env up -d
+#
+# El archivo de entorno define ENTORNO, las imágenes y los secretos (ver entornos/*.env.example).
+# Caddy (compose.borde.yaml) llega al front por la red compartida `reto1-borde`.
+name: reto1-${ENTORNO:?Falta ENTORNO}
+
+services:
+  db:
+    image: docker.io/library/postgres:17
+    environment:
+      POSTGRES_USER: reto1
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Falta POSTGRES_PASSWORD}
+      POSTGRES_DB: reto1
+    volumes:
+      - datos:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U reto1 -d reto1"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  back:
+    image: ${IMAGEN_BACK:?Falta IMAGEN_BACK}
+    env_file:
+      - entornos/${ENTORNO}.env
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  front:
+    image: ${IMAGEN_FRONT:?Falta IMAGEN_FRONT}
+    environment:
+      BACK_URL: http://back:8000
+    depends_on:
+      - back
+    networks:
+      default:
+      borde:
+        aliases:
+          - front-${ENTORNO}
+    restart: unless-stopped
+
+volumes:
+  datos:
+
+networks:
+  borde:
+    name: reto1-borde
+    external: true
