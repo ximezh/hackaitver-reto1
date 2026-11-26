@@ -56,3 +56,8 @@ class Sesion(BaseModel):
             contrasena_temporal=usuario.contrasena_temporal,
             usuario=Perfil.model_validate(usuario),
         )
+
+
+class CambioContrasena(BaseModel):
+    actual: str = Field(title="Contraseña actual", min_length=1)
+    nueva: str = Field(title="Contraseña nueva", min_length=1)

@@ -4,7 +4,7 @@ from fastapi import APIRouter
 from sqlalchemy import func, select
 
 from app.auth.dependencias import SesionDb, UsuarioEnSesion
-from app.auth.esquemas import LoginEntrada, Perfil, Sesion
+from app.auth.esquemas import CambioContrasena, LoginEntrada, Perfil, Sesion
 from app.auth.tokens import crear_token, segundos_de_vida
 from app.contrasenas import hashear, verificar
 from app.errores import ErrorApi, validacion
@@ -13,6 +13,7 @@ from app.models.comun import PREFIJO_DE_ROL, Estado, Rol
 
 router = APIRouter(prefix="/auth", tags=["sesión"])
 
+LONGITUD_MINIMA = 8
 REVISA = "Revisa usuario y contraseña"
 
 # Se verifica contra este hash cuando el usuario no existe, para que la respuesta tarde lo
@@ -53,4 +54,25 @@ def login(datos: LoginEntrada, session: SesionDb) -> Sesion:
 
 @router.get("/me")
 def perfil(usuario: UsuarioEnSesion) -> Perfil:
+    """Perfil (P-10): quién es y su usuario. Responde también con contraseña temporal."""
     return Perfil.model_validate(usuario)
+
+
+@router.post("/contrasena")
+def cambiar_contrasena(
+    datos: CambioContrasena, usuario: UsuarioEnSesion, session: SesionDb
+) -> Sesion:
+    """Cambia la contraseña y entrega un token nuevo, ya sin contraseña temporal (R-17)."""
+    if not verificar(usuario.contrasena_hash, datos.actual):
+        raise ErrorApi(400, "contrasena_actual_incorrecta", "La contraseña actual no coincide")
+    if len(datos.nueva) < LONGITUD_MINIMA:
+        raise validacion(
+            {"nueva": f"La contraseña debe tener al menos {LONGITUD_MINIMA} caracteres"}
+        )
+    if datos.nueva == datos.actual:
+        raise validacion({"nueva": "La contraseña nueva debe ser distinta de la actual"})
+
+    usuario.contrasena_hash = hashear(datos.nueva)
+    usuario.contrasena_temporal = False
+    session.commit()
+    return _sesion(usuario)

@@ -1,10 +1,11 @@
-"""Dependencias para proteger rutas: sesión y rol (BE-10).
+"""Dependencias para proteger rutas: sesión, contraseña temporal y rol (BE-10, BE-15).
 
     @router.get("/productos")
     def listar(oficina: Oficina) -> ...
 
-- `usuario_en_sesion`: cualquier usuario con sesión vigente y activo.
-- `usuario_actual`: el usuario con el que trabajan las rutas de cada rol.
+- `usuario_en_sesion`: cualquier usuario con sesión vigente y activo, también con contraseña
+  temporal. Solo la usan `GET /api/auth/me` y `POST /api/auth/contrasena`.
+- `usuario_actual`: además exige que ya haya cambiado su contraseña temporal (R-17).
 - `requiere_rol(...)`: además exige uno de los roles indicados.
 """
 
@@ -17,7 +18,7 @@ from sqlalchemy.orm import Session
 
 from app.auth.tokens import id_del_token
 from app.db import get_session
-from app.errores import NO_AUTENTICADO, SIN_PERMISO, error
+from app.errores import CAMBIO_CONTRASENA, NO_AUTENTICADO, SIN_PERMISO, error
 from app.models import Usuario
 from app.models.comun import Estado, Rol
 
@@ -44,6 +45,9 @@ UsuarioEnSesion = Annotated[Usuario, Depends(usuario_en_sesion)]
 
 
 def usuario_actual(usuario: UsuarioEnSesion) -> Usuario:
+    """Mientras la contraseña sea temporal, solo se permiten el perfil y el cambio (R-17)."""
+    if usuario.contrasena_temporal:
+        raise error(CAMBIO_CONTRASENA)
     return usuario
 
 
