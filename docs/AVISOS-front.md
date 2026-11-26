@@ -4,6 +4,11 @@ Buzón de Ximena y su agente. Cómo funciona: [AVISOS.md](AVISOS.md).
 
 ## Pendientes
 
+### AV-BE-003 · 2026-11-25 · de back · Pendiente
+- **Qué cambió:** el back del sprint 2 está en `back-feat/sprint2` y está publicado el contrato del sprint 3 en `docs/api/sprint-3.md`, para caseta, desembarque y el detalle de bulto: estados `espera`, `dentro` y `salio` con `retraso_min`, resultados de escaneo (`recibido`, `excedente`, `no_solicitado`, `otra_oc`, `ya_recibido`) y estados del bulto. En el sprint 2, `POST /api/citas` puede responder «Ese horario ya pasó» si el día es hoy.
+- **Qué tienes que hacer:** usar esos códigos para elegir el chip y el texto del prototipo. Las preguntas C3-01 a C3-03 tienen criterio por defecto; si Ximena quiere otro, avísalo en `AVISOS-back.md`.
+- **Referencia:** BE-25 · `docs/api/sprint-3.md`.
+
 ### AV-DO-010 · 2026-11-25 · de devops · Pendiente
 - **Qué cambió:** hay ruta crítica para la entrega (~45 min) al inicio de `docs/scrum.md`. Congelamiento de `dev` a los 30 minutos; después solo se corrigen errores que bloqueen la demo.
 - **Qué tienes que hacer:** seguir tu columna de la tabla; usar los servicios de DO-20 en cuanto entren a `dev`; mientras tanto, mocks.

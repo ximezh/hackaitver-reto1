@@ -201,7 +201,8 @@ def test_eliminar_con_historial_desactiva(api: TestClient, oficina: dict, db: Se
     assert r.json()["registro"]["sku"] == "CLI-0100"
 
 
-@pytest.mark.parametrize("usuario", ["suc07", "pgolfo", "caseta.jlopez"])
+# Sucursal sí lee la lista desde el sprint 2 (ver tests/test_pedidos.py).
+@pytest.mark.parametrize("usuario", ["pgolfo", "caseta.jlopez"])
 def test_solo_oficina(api: TestClient, usuario: str) -> None:
     r = api.get(RUTA, headers=entrar(api, usuario))
     assert r.status_code == 403

@@ -9,7 +9,7 @@ from pydantic import BaseModel
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
-from app import folios
+from app import folios, tiempo
 from app.db import get_engine
 from app.tiempo import FechaHora, a_local, ahora
 
@@ -23,7 +23,7 @@ def test_formatos_del_prototipo(db: Session) -> None:
 
 def test_oc_lleva_el_anio_de_la_operacion(db: Session, monkeypatch: pytest.MonkeyPatch) -> None:
     # 05:30 UTC del 1 de enero de 2027 son las 23:30 del 31 de diciembre de 2026 en México.
-    monkeypatch.setattr(folios, "ahora", lambda: a_local(datetime(2027, 1, 1, 5, 30, tzinfo=UTC)))
+    monkeypatch.setattr(tiempo, "ahora", lambda: a_local(datetime(2027, 1, 1, 5, 30, tzinfo=UTC)))
     assert folios.folio_oc(db).startswith("OC-26-")
 
 
