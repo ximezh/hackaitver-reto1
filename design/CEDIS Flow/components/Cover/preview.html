@@ -1,0 +1,39 @@
+<!-- @dsCard height=288 -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>CEDIS Flow — portada</title>
+<style>
+html,body{margin:0;background:var(--surface-0)}
+.cv{position:relative;width:960px;height:288px;overflow:hidden;background:var(--surface-0)}
+.cv svg{position:absolute;left:0;top:0}
+.brand{fill:var(--brand-600)}.ink{fill:var(--ink)}.tint{fill:var(--brand-50)}
+.heavy{fill:var(--pallet-heavy)}.mid{fill:var(--pallet-mid)}.light{fill:var(--pallet-light)}
+.wood{fill:var(--wood)}
+.grid{stroke:rgba(255,255,255,.35);stroke-width:1}
+.t{position:absolute;left:48px;bottom:44px;width:420px}
+.t h1{margin:0;font:600 88px/0.93 Poppins,system-ui,sans-serif;color:var(--ink);letter-spacing:-.02em}
+.t p{margin:16px 0 0;font:400 14px/20px Poppins,system-ui,sans-serif;color:var(--ink-muted)}
+</style></head>
+<body>
+<div class="cv">
+<svg width="960" height="288" viewBox="0 0 960 288" aria-hidden="true">
+  <!-- blocks: brand-600 slab 232×288, ink 120×120, brand-50 tint 120×168, tarima heavy/mid/light 216 wide, wood base -->
+  <!-- arrangement: tall brand slab bleeding off top and bottom, a pallet stack beside it like the CEDIS racks -->
+  <!-- pattern: box grid (cajas apiladas) at space-4 (16px) pitch, from the system's motif of bultos on a tarima -->
+  <!-- steps: space-4 16px, space-6 24px, space-8 32px; radii radius-sm 8px on the stack, square slab -->
+  <rect class="tint" x="496" y="0" width="120" height="168"/>
+  <rect class="ink" x="496" y="168" width="120" height="120"/>
+  <g transform="translate(632,40)">
+    <rect class="light" x="0" y="0" width="216" height="56" rx="8"/>
+    <rect class="mid" x="0" y="64" width="216" height="64" rx="8"/>
+    <rect class="heavy" x="0" y="136" width="216" height="80" rx="8"/>
+    <rect class="wood" x="0" y="224" width="216" height="16"/>
+    <rect class="wood" x="0" y="240" width="24" height="16"/><rect class="wood" x="96" y="240" width="24" height="16"/><rect class="wood" x="192" y="240" width="24" height="16"/>
+    <path class="grid" d="M54 0V56M108 0V56M162 0V56M0 28H216M72 64V128M144 64V128M0 96H216M54 136V216M108 136V216M162 136V216M0 176H216"/>
+  </g>
+  <rect class="brand" x="864" y="0" width="96" height="288"/>
+</svg>
+<div class="t"><h1>CEDIS Flow</h1><p>De la orden de compra al embarque, claro para cada trabajador.</p></div>
+</div>
+</body>
+</html>

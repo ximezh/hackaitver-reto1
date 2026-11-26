@@ -1,0 +1,13 @@
+# CEDIS Flow en el Caddy del sistema (instancia compartida con otros proyectos).
+# Se copia a /etc/caddy/cedis.caddy y se incluye con `import cedis.caddy` en /etc/caddy/Caddyfile.
+# El front de cada entorno escucha en 127.0.0.1 y su Nginx reenvía /api a su back.
+
+cedis.13-184-89-164.sslip.io {
+	encode zstd gzip
+	reverse_proxy 127.0.0.1:8180
+}
+
+staging.cedis.13-184-89-164.sslip.io {
+	encode zstd gzip
+	reverse_proxy 127.0.0.1:8181
+}

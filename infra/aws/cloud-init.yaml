@@ -1,0 +1,16 @@
+#cloud-config
+# Paquetes base de una instancia dedicada (Ubuntu 24.04) para CEDIS Flow. La usa crear-instancia.sh
+# como user-data. El resto (usuario cedis, Podman sin root, Caddy y despliegue continuo) lo hace
+# infra/preparar-instancia.sh, el mismo script que se usa en una instancia compartida.
+
+package_update: true
+package_upgrade: true
+packages:
+  - podman
+  - uidmap
+  - slirp4netns
+  - passt
+  - caddy
+  - git
+  - curl
+  - unattended-upgrades

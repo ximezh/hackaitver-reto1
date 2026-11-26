@@ -1,0 +1,57 @@
+# --- Entorno y secretos ---
+.env
+.env.*
+!.env.example
+infra/entornos/*.env
+infra/entornos/demo-*.txt
+*.pem
+*.key
+
+# --- Sistema y editores ---
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.swp
+*.sw?
+*.suo
+
+# --- Logs ---
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# --- Front (Vue + Vite) ---
+node_modules/
+dist/
+dist-ssr/
+coverage/
+*.local
+.eslintcache
+*.tsbuildinfo
+*.timestamp-*-*.mjs
+__screenshots__/
+
+# --- Back (Python + uv) ---
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+.coverage.*
+htmlcov/
+*.egg-info/
+build/
+
+# --- Bases de datos locales ---
+*.db
+*.sqlite
+*.sqlite3
+*.dump
+*.sql.gz

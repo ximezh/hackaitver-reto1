@@ -1,0 +1,56 @@
+<!-- @dsCard group="Acceso" height=800 width=1250 subtitle="Web · Sucursal, Proveedor, Oficina" -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Login web</title>
+<style>
+.lw{width:1200px;height:740px;border-radius:16px;overflow:hidden;display:flex;box-shadow:var(--shadow-pop);background:var(--surface-0);position:relative}
+.art{flex:1.15;background:var(--brand-600);position:relative;display:flex;flex-direction:column;justify-content:space-between;padding:36px;color:#fff;overflow:hidden}
+.art .ill{position:absolute;inset:90px 30px 110px;display:grid;place-items:center}
+.art .ill img{width:100%;height:100%;object-fit:contain;transition:opacity .3s}
+.art .ill .disc{position:absolute;width:420px;height:420px;border-radius:50%;background:rgba(255,255,255,.95)}
+.art .ill img{position:relative}
+.dots{display:flex;gap:8px}.dots i{width:8px;height:8px;border-radius:99px;background:rgba(255,255,255,.4);transition:.2s}.dots i.on{width:26px;background:#fff}
+.frm{flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 90px;gap:14px}
+.roles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.roles button{height:84px;border:1.5px solid var(--line);border-radius:16px;background:var(--surface-0);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font-weight:600;font-size:13px;color:var(--ink-muted);transition:.15s}
+.roles button.on{border-color:var(--brand-600);background:var(--brand-50);color:var(--brand-700)}
+.ok{position:absolute;inset:0;background:rgba(255,255,255,.96);display:grid;place-items:center;opacity:0;pointer-events:none;transition:.3s}
+.ok.show{opacity:1;pointer-events:auto}
+</style></head>
+<body>
+<div class="stage"><div class="lw" id="scr">
+  <div class="art">
+    <div class="brand" style="color:#fff;padding:0"><span class="logo" style="background:#fff;color:var(--brand-600)" id="lg"></span>CEDIS Flow</div>
+    <div class="ill"><span class="disc"></span><img id="ill" alt=""></div>
+    <div><div class="t-title" id="cap" style="color:#fff">Pide y recibe a tiempo</div><div class="dots" id="dots" style="margin-top:12px"></div></div>
+  </div>
+  <div class="frm">
+    <div class="t-display">Inicia sesión</div>
+    <div class="roles" id="roles"></div>
+    <label class="field"><span id="iU"></span><input id="u" placeholder="Correo o usuario" aria-label="Usuario"></label>
+    <label class="field"><span id="iL"></span><input id="p" type="password" placeholder="Contraseña" aria-label="Contraseña"></label>
+    <div class="row" style="justify-content:space-between"><label class="row t-cap" style="gap:6px"><input type="checkbox" checked> Recordarme</label><a class="t-cap" style="color:var(--brand-700);font-weight:600" href="#">¿Olvidaste tu contraseña?</a></div>
+    <button class="btn primary block" id="go">Entrar</button>
+  </div>
+  <div class="ok" id="ok"></div>
+</div></div>
+<script>
+(function(){
+  var C=window.Cedis,$=function(i){return document.getElementById(i)};
+  $('lg').innerHTML=C.ic('cube',20,2.2); $('iU').innerHTML=C.ic('user'); $('iL').innerHTML=C.ic('lock');
+  var R=[{k:'sucursal',n:'Sucursal',i:'store',img:C.A.sucursal,cap:'Pide y recibe a tiempo',u:'suc07@empresa.mx'},
+         {k:'proveedor',n:'Proveedor',i:'factory',img:C.A.anden,cap:'Agenda tu cita de entrega',u:'ventas@papeleradelgolfo.mx'},
+         {k:'oficina',n:'Oficina',i:'grid',img:C.A.datos,cap:'Control total del catálogo',u:'admin.cedis'}];
+  var cur=0;
+  function draw(){ $('roles').innerHTML=R.map(function(r,i){return '<button class="'+(i===cur?'on':'')+'" data-i="'+i+'">'+C.ic(r.i,24)+r.n+'</button>'}).join('');
+    $('ill').src=R[cur].img; $('cap').textContent=R[cur].cap; $('u').placeholder=R[cur].u;
+    $('dots').innerHTML=R.map(function(r,i){return '<i class="'+(i===cur?'on':'')+'"></i>'}).join(''); }
+  $('roles').onclick=function(e){var b=e.target.closest('button');if(!b)return;cur=+b.dataset.i;draw();};
+  $('go').onclick=function(){var r=R[cur];
+    $('ok').innerHTML='<div style="text-align:center"><div class="logo" style="width:84px;height:84px;border-radius:26px;margin:0 auto 14px;animation:pop .4s">'+C.ic(r.i,40)+'</div><div class="t-title">Portal '+r.n+'</div><div class="muted" style="margin-bottom:16px">Cargando tu espacio…</div><button class="btn line" id="bk">Volver</button></div>';
+    $('ok').classList.add('show'); $('bk').onclick=function(){$('ok').classList.remove('show')}; };
+  draw();
+})();
+</script>
+</body>
+</html>

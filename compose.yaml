@@ -1,0 +1,27 @@
+# PostgreSQL para desarrollo local y pruebas del back.
+#   podman compose up -d     (por decisión del equipo se usa Podman)
+# Crea dos bases: `reto1` para desarrollo y `reto1_test` para pytest (ver back/README.md).
+# Las credenciales son solo para esta base local; en otros entornos salen de DATABASE_URL.
+name: reto1
+
+services:
+  db:
+    image: docker.io/library/postgres:17
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-reto1}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-reto1}
+      POSTGRES_DB: reto1
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - datos:/var/lib/postgresql/data
+      # Scripts que corren solo cuando el volumen está vacío: crean `reto1_test`.
+      - ./back/db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d reto1"]
+      interval: 2s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  datos:

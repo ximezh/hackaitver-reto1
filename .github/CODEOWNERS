@@ -1,0 +1,30 @@
+# Revisores por área, según la tabla de propiedad de docs/scrum.md.
+# La última regla que coincide es la que aplica.
+# Front: @ximezh (Ximena) · Back: @vLGsus (Jesus) · DevOps: @LDaniel-Morales (Luis Daniel)
+
+# Compartidos: cualquier cambio lo revisa todo el equipo.
+*                       @ximezh @vLGsus @LDaniel-Morales
+
+# Front
+/front/                 @ximezh
+/docs/scrum/front.md    @ximezh
+
+# Back
+/back/                  @vLGsus
+/compose.yaml           @vLGsus
+/docs/api/              @vLGsus
+/docs/scrum/back.md     @vLGsus
+
+# DevOps
+/front/src/api/         @LDaniel-Morales
+/front/vite.config.js   @LDaniel-Morales
+/front/.env.example     @LDaniel-Morales
+/front/Dockerfile       @LDaniel-Morales
+/back/Dockerfile        @LDaniel-Morales
+/.github/               @LDaniel-Morales
+/infra/                 @LDaniel-Morales
+/tools/                 @LDaniel-Morales
+/docs/scrum/devops.md   @LDaniel-Morales
+
+# Prototipo: solo lectura; un cambio autorizado lo revisa todo el equipo.
+/design/                @ximezh @vLGsus @LDaniel-Morales

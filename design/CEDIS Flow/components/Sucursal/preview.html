@@ -1,0 +1,67 @@
+<!-- @dsCard group="Web" height=800 width=1250 subtitle="Portal de sucursal: pedir, seguir el envío e historial" -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Portal sucursal</title>
+<style>
+.cols{display:grid;grid-template-columns:1fr 300px;gap:18px}
+.cat{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.prod{padding:12px;display:flex;flex-direction:column;gap:8px}
+.prod .im{height:110px;border-radius:12px;background:var(--brand-50);display:grid;place-items:center}
+.prod .im img{height:96px;max-width:90%;object-fit:contain}
+.step{display:flex;align-items:center;border:1.5px solid var(--line);border-radius:12px;height:38px;overflow:hidden}
+.step button{width:38px;height:100%;border:0;background:var(--surface-50);display:grid;place-items:center}
+.step b{flex:1;text-align:center}
+.cart .it{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.trk{display:flex;align-items:flex-start;margin:16px 0 4px}
+.trk .s{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;position:relative;font-size:11px;font-weight:600;color:var(--ink-muted);text-align:center}
+.trk .s:before{content:"";position:absolute;top:19px;left:-50%;right:50%;height:3px;background:var(--line);z-index:0}
+.trk .s:first-child:before{display:none}
+.trk .s.done:before,.trk .s.now:before{background:var(--brand-600)}
+.trk .b{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:#fff;border:2px solid var(--line);position:relative;z-index:1;color:var(--ink-muted)}
+.trk .s.done .b{background:var(--brand-600);border-color:var(--brand-600);color:#fff}
+.trk .s.now .b{border-color:var(--brand-600);color:var(--brand-600);box-shadow:0 0 0 6px var(--brand-50)}
+.trk .s.now{color:var(--brand-700)}
+.ord{padding:18px 20px;margin-bottom:14px}
+</style></head>
+<body>
+<div class="stage"><div class="web" id="scr" style="position:relative">
+  <aside class="side"><div class="brand"><span class="logo" id="lg"></span>CEDIS Flow</div><nav class="nav" id="nav"></nav>
+    <div style="margin-top:auto" class="card pad"><div class="row"><div class="avatar">07</div><div class="grow"><div class="t-data ellip" style="font-size:13px">Suc. 07 Boca del Río</div><div class="t-cap">Sucursal</div></div></div></div></aside>
+  <section class="main"><header class="top"><h1 id="ttl"></h1><label class="field sm" style="width:260px"><span id="is"></span><input placeholder="Buscar producto o pedido"></label><button class="iconbtn" id="bell" aria-label="Avisos"></button></header>
+    <div class="content" id="ct"></div></section>
+</div></div>
+<script>
+(function(){
+  var C=window.Cedis,$=function(i){return document.getElementById(i)};
+  $('lg').innerHTML=C.ic('cube',20,2.2); $('is').innerHTML=C.ic('search',18); $('bell').innerHTML=C.ic('bell');
+  var view='pedir', cart={'PAP-0100':4,'LAP-0012':2};
+  var STEPS=[['file','OC emitida'],['factory','Proveedor'],['warehouse','En CEDIS'],['pallet','En tarima'],['truck','En camino'],['store','Recibido']];
+  var orders=[{oc:'OC-26-1182',fecha:'21 nov',b:24,st:4,emb:'EMB-0412',eta:'Hoy 13:30'},{oc:'OC-26-1203',fecha:'23 nov',b:12,st:2,eta:'Jue 27'},{oc:'OC-26-1210',fecha:'24 nov',b:8,st:1,eta:'Vie 28'}];
+  var hist=[['19 nov','OC-26-1131','EMB-0398',30,'ok','Completo'],['14 nov','OC-26-1109','EMB-0381',22,'warn','1 faltante'],['07 nov','OC-26-1088','EMB-0360',18,'ok','Completo'],['31 oct','OC-26-1052','EMB-0339',26,'ok','Completo']];
+  var NAV=[['pedir','cart','Pedir'],['camino','truck','En camino'],['hist','history','Historial']];
+  function nav(){ $('nav').innerHTML=NAV.map(function(n){return '<button class="'+(view===n[0]?'on':'')+'" data-v="'+n[0]+'">'+C.ic(n[1])+n[2]+(n[0]==='camino'?'<span class="chip" style="margin-left:auto;height:22px">'+orders.length+'</span>':'')+'</button>'}).join(''); $('ttl').textContent=NAV.filter(function(n){return n[0]===view})[0][2]; }
+  $('nav').onclick=function(e){var b=e.target.closest('button');if(!b)return;view=b.dataset.v;render();};
+  function pedir(){
+    var tb=0,tk=0; Object.keys(cart).forEach(function(s){var p=C.bySku(s);tb+=cart[s];tk+=cart[s]*p.kg});
+    $('ct').innerHTML='<div class="cols"><div class="cat" id="cat">'+C.productos.map(function(p){var q=cart[p.sku]||0;return '<div class="card prod"><div class="im"><img src="'+C.A[p.img]+'" alt=""></div><div class="t-data ellip">'+p.nombre+'</div><div class="t-cap">'+p.sku+' · bulto de '+p.porBulto+' '+p.unidad+'</div><div class="step"><button data-s="'+p.sku+'" data-d="-1" aria-label="Menos">'+C.ic('minus',16)+'</button><b>'+q+'</b><button data-s="'+p.sku+'" data-d="1" aria-label="Más">'+C.ic('plus',16)+'</button></div></div>'}).join('')+'</div>'+
+      '<div><div class="card pad cart" style="position:sticky;top:0"><div class="row"><div class="t-sub grow">Tu pedido</div><span class="chip">'+tb+' bultos</span></div>'+
+      (tb?Object.keys(cart).map(function(s){var p=C.bySku(s);return '<div class="it"><span class="thumb" style="width:36px;height:36px"><img src="'+C.A[p.img]+'" alt=""></span><div class="grow"><div class="t-data ellip" style="font-size:13px">'+p.nombre+'</div><div class="t-cap">'+cart[s]+' bultos</div></div><b style="font-size:13px">'+C.kg(cart[s]*p.kg)+'</b></div>'}).join(''):'<div class="t-cap" style="padding:30px 0;text-align:center">'+C.ic('cart',28)+'<br>Agrega productos</div>')+
+      '<div class="row" style="justify-content:space-between;margin:12px 0"><span class="muted">Peso estimado</span><b>'+C.kg(tk)+'</b></div><button class="btn primary block" id="send" '+(tb?'':'disabled')+'>'+C.ic('send',18)+'Enviar pedido</button></div></div></div>';
+    $('cat').onclick=function(e){var b=e.target.closest('button');if(!b)return;var s=b.dataset.s,n=(cart[s]||0)+(+b.dataset.d);if(n<=0)delete cart[s];else cart[s]=n;pedir();};
+    if($('send'))$('send').onclick=function(){var n='OC-26-12'+(11+orders.length);orders.push({oc:n,fecha:'25 nov',b:tb,st:0,eta:'Lun 1'});cart={};C.toast($('scr'),n+' enviada al CEDIS','check');view='camino';render();};
+  }
+  function camino(){
+    $('ct').innerHTML=orders.map(function(o,i){return '<div class="card ord"><div class="row"><div class="grow"><div class="t-sub">'+o.oc+'</div><div class="t-cap">'+o.fecha+' · '+o.b+' bultos'+(o.emb?' · '+o.emb:'')+'</div></div><span class="chip '+(o.st>=4?'':'mute')+'">'+C.ic('clock',14,2)+'Llega '+o.eta+'</span>'+(o.st===4?'<button class="btn primary sm" data-i="'+i+'">'+C.ic('qr',16)+'Recibir con QR</button>':'')+'</div>'+
+      '<div class="trk">'+STEPS.map(function(s,k){return '<div class="s '+(k<o.st?'done':k===o.st?'now':'')+'"><span class="b">'+C.ic(k<o.st?'check':s[0],18,k<o.st?2.6:1.8)+'</span>'+s[1]+'</div>'}).join('')+'</div></div>'}).join('');
+    $('ct').onclick=function(e){var b=e.target.closest('button[data-i]');if(!b)return;var o=orders[+b.dataset.i];o.st=5;hist.unshift(['25 nov',o.oc,o.emb,o.b,'ok','Completo']);C.toast($('scr'),o.emb+' recibido · '+o.b+' bultos','check');camino();};
+  }
+  function histv(){ $('ct').onclick=null;
+    $('ct').innerHTML='<div class="kpis">'+[['box','Bultos recibidos (mes)','96'],['check','Pedidos completos','94%'],['clock','Tiempo OC → entrega','3.2 días'],['alert','Faltantes','1']].map(function(k){return '<div class="card kpi"><span class="ic">'+C.ic(k[0],22)+'</span><div><div class="t-cap">'+k[1]+'</div><div class="t-data">'+k[2]+'</div></div></div>'}).join('')+'</div>'+
+      '<div class="card" style="overflow:hidden"><table class="tbl"><tr><th>Fecha</th><th>Pedido</th><th>Embarque</th><th>Bultos</th><th>Estado</th><th></th></tr>'+hist.map(function(h){return '<tr><td>'+h[0]+'</td><td><b>'+h[1]+'</b></td><td>'+h[2]+'</td><td>'+h[3]+'</td><td><span class="chip '+h[4]+'"><span class="dot"></span>'+h[5]+'</span></td><td><button class="btn line sm">'+C.ic('file',16)+'Relación</button></td></tr>'}).join('')+'</table></div>';
+  }
+  function render(){ $('ct').onclick=null; nav(); if(view==='pedir')pedir(); else if(view==='camino')camino(); else histv(); }
+  render();
+})();
+</script>
+</body>
+</html>

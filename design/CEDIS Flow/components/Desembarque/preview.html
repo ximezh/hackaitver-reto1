@@ -1,0 +1,71 @@
+<!-- @dsCard group="CEDIS · Android" height=860 subtitle="Recepción: lo que llegó contra la OC" -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Supervisor de desembarque</title>
+<style>
+.hero{margin:0 16px;padding:16px;display:flex;gap:16px;align-items:center}
+.ring{width:112px;height:112px;flex:none;position:relative}
+.ring svg{transform:rotate(-90deg)}
+.ring .c{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring .c b{font-size:26px;line-height:30px}
+.stats{display:flex;flex-direction:column;gap:8px;flex:1}
+.stats .chip{justify-content:space-between;width:100%;height:30px}
+.scanbtn{margin:14px 16px 0;height:64px;border-radius:20px;font-size:16px}
+.lines{margin:14px 16px 100px}
+.ln{display:flex;gap:12px;align-items:center;padding:12px}
+.mini{height:6px;margin-top:6px}
+.cnt{font-weight:700;font-size:15px;text-align:right;min-width:54px}
+.cnt small{color:var(--ink-muted);font-weight:500}
+.res{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px}
+.res .big{width:76px;height:76px;border-radius:24px;display:grid;place-items:center;animation:pop .35s}
+.res img{width:140px;height:110px;object-fit:contain}
+.scanbox{position:relative;height:200px;border-radius:16px;background:#0f1f3d;overflow:hidden;display:grid;place-items:center;margin-bottom:12px}
+.scanbox .frame{width:150px;height:150px;border:3px solid rgba(255,255,255,.85);border-radius:16px}
+.scanbox .l{position:absolute;left:25%;right:25%;height:2px;background:#5b9bff;box-shadow:0 0 12px #5b9bff;animation:scanline 1.6s infinite}
+</style></head>
+<body>
+<div class="stage"><div class="phone"><div class="screen" id="scr">
+  <div id="sb"></div>
+  <div class="appbar"><button class="iconbtn" id="back" aria-label="Regresar"></button><div class="grow"><div class="t-cap">Andén R2 · Recibo</div><h1 style="font-size:18px">OC-26-1182</h1></div><span class="chip ok" id="fac"></span></div>
+  <div class="scroll">
+    <div class="card hero"><div class="ring" id="ring"></div><div class="stats" id="stats"></div></div>
+    <button class="btn primary block scanbtn" id="scan" style="width:calc(100% - 32px)"></button>
+    <div class="t-over" style="padding:16px 16px 0">Contra la orden de compra</div>
+    <div class="card lines list" id="lines"></div>
+  </div>
+  <nav class="tabbar" id="tabs"></nav>
+  <div class="sheet" id="sh"><div class="body" id="shb"></div></div>
+</div></div></div>
+<script>
+(function(){
+  var C=window.Cedis,$=function(i){return document.getElementById(i)};
+  $('sb').innerHTML=C.statusBar(); $('back').innerHTML=C.ic('left'); $('fac').innerHTML=C.ic('file',14,2)+'FAC-A-20418';
+  $('scan').innerHTML=C.ic('scan',26)+'Escanear bulto';
+  var oc=[{sku:'PAP-0100',pide:10,ok:8},{sku:'LAP-0012',pide:6,ok:6},{sku:'CLI-0100',pide:8,ok:3}], rech=1;
+  var seq=['PAP-0100','CLI-0100','FOL-0100','CLI-0100','PAP-0100','CLI-0100','CLI-0100','LAP-0012','CLI-0100'], si=0, n=4;
+  function tot(){var p=0,o=0;oc.forEach(function(l){p+=l.pide;o+=l.ok});return {p:p,o:o};}
+  function draw(){ var t=tot(), r=50, L=2*Math.PI*r, pct=t.o/t.p;
+    $('ring').innerHTML='<svg width="112" height="112"><circle cx="56" cy="56" r="'+r+'" stroke="var(--brand-50)" stroke-width="11" fill="none"/><circle cx="56" cy="56" r="'+r+'" stroke="'+(pct>=1?'var(--success)':'var(--brand-600)')+'" stroke-width="11" fill="none" stroke-linecap="round" stroke-dasharray="'+L+'" stroke-dashoffset="'+(L*(1-pct))+'" style="transition:stroke-dashoffset .6s"/></svg><div class="c"><b>'+t.o+'</b><span class="t-cap">de '+t.p+' bultos</span></div>';
+    $('stats').innerHTML='<span class="chip ok"><span class="row" style="gap:6px">'+C.ic('check',14,2.4)+'Recibidos</span><b>'+t.o+'</b></span><span class="chip warn"><span class="row" style="gap:6px">'+C.ic('clock',14,2)+'Faltan</span><b>'+(t.p-t.o)+'</b></span><span class="chip bad"><span class="row" style="gap:6px">'+C.ic('x',14,2.4)+'Rechazados</span><b>'+rech+'</b></span>';
+    $('lines').innerHTML=oc.map(function(l){var p=C.bySku(l.sku),done=l.ok>=l.pide;return '<div class="ln"><span class="thumb"><img src="'+C.A[p.img]+'" alt=""></span><div class="grow"><div class="t-data ellip">'+p.nombre+'</div><div class="t-cap">'+p.sku+' · '+C.kg(p.kg)+' c/u</div><div class="bar mini '+(done?'ok':'')+'"><i style="width:'+(l.ok/l.pide*100)+'%"></i></div></div><div class="cnt">'+(done?'<span style="color:var(--success)">'+C.ic('check',20,2.6)+'</span>':l.ok+'<small>/'+l.pide+'</small>')+'</div></div>'}).join('')+
+      (pct>=1?'<div class="ln"><button class="btn ok block" id="fin">'+C.ic('pallet',20)+'Cerrar recepción y armar tarima</button></div>':'');
+    if($('fin'))$('fin').onclick=function(){C.toast($('scr'),'Recepción cerrada · 24 bultos','check')};
+  }
+  function result(sku){ var line=oc.filter(function(l){return l.sku===sku})[0], p=C.bySku(sku), id='B-00'+(10+n++);
+    var bad=!line||line.ok>=line.pide, html;
+    if(bad){ rech++; html='<div class="res"><div class="big" style="background:var(--danger-50);color:var(--danger)">'+C.ic('x',40,2.4)+'</div><div class="t-title">No se recibe</div><span class="chip bad">'+(line?'Excedente':'SKU no solicitado')+'</span><img src="'+C.A[p.img]+'" alt=""><div class="t-data">'+p.nombre+'</div><div class="t-cap">'+id+' · '+p.sku+'</div><button class="btn danger block" id="rep" style="margin-top:8px">'+C.ic('alert',18)+'Reportar al proveedor</button></div>'; }
+    else { line.ok++; var z=C.zonas[C.zona(p.kg)]; html='<div class="res"><div class="big" style="background:var(--success-50);color:var(--success)">'+C.ic('check',40,2.6)+'</div><div class="t-title">Bulto recibido</div><img src="'+C.A[p.img]+'" alt=""><div class="t-data">'+p.nombre+'</div><div class="t-cap">'+id+' · '+p.porBulto+' '+p.unidad+' · '+C.kg(p.kg)+'</div><span class="chip" style="background:'+z.hex+';color:'+z.fg+';margin-top:6px">'+C.ic('pallet',14,2)+'A '+z.nombre.toLowerCase()+'</span><button class="btn primary block" id="nx" style="margin-top:10px">'+C.ic('scan',18)+'Siguiente</button></div>'; }
+    $('shb').innerHTML='<div class="grab"></div>'+html; draw();
+    if($('rep'))$('rep').onclick=function(){$('sh').classList.remove('open');C.toast($('scr'),'Reporte enviado','send')};
+    if($('nx'))$('nx').onclick=scan;
+  }
+  function scan(){ var t=tot(); if(t.o>=t.p){C.toast($('scr'),'OC completa','check');$('sh').classList.remove('open');return;}
+    $('shb').innerHTML='<div class="grab"></div><div class="scanbox"><div class="frame"></div><div class="l"></div></div><div class="t-sub" style="text-align:center">Apunta a la etiqueta QR</div>';
+    $('sh').classList.add('open'); setTimeout(function(){result(seq[si++%seq.length])},1100); }
+  $('scan').onclick=scan; $('sh').onclick=function(e){if(e.target===this)this.classList.remove('open')};
+  $('tabs').innerHTML=[['home','Inicio'],['scan','Recibir',1],['pallet','Tarimas'],['history','Historial']].map(function(t){return '<button class="'+(t[2]?'on':'')+'"><span class="pill">'+C.ic(t[0],20)+'</span>'+t[1]+'</button>'}).join('');
+  draw();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!-- @dsCard group="Web" height=800 width=1250 subtitle="Portal del proveedor: cita, factura por bulto, etiquetas e historial" -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Portal proveedor</title>
+<style>
+.cols{display:grid;grid-template-columns:300px 1fr;gap:18px;height:100%}
+.days{display:flex;gap:8px;margin-bottom:12px}
+.days button{border:1.5px solid var(--line);background:#fff;border-radius:12px;width:62px;height:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;color:var(--ink-muted);font-weight:500}
+.days button b{font-size:17px;color:var(--ink)}
+.days button.on{border-color:var(--brand-600);background:var(--brand-50)}
+.days button.on b{color:var(--brand-700)}
+.cal{display:grid;grid-template-columns:52px repeat(4,1fr);position:relative;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff}
+.cal .hd{height:36px;display:flex;align-items:center;justify-content:center;gap:6px;font-size:12px;font-weight:600;border-bottom:1px solid var(--line);background:var(--surface-50)}
+.cal .hr{height:24px;font-size:10px;color:var(--ink-muted);padding:0 6px;text-align:right;border-right:1px solid var(--line)}
+.cal .c{height:24px;border-right:1px solid var(--line);cursor:pointer}
+.cal .c.hh{border-top:1px solid var(--line)}
+.cal .c:hover{background:var(--brand-50)}
+.blk{position:absolute;border-radius:8px;padding:3px 8px;font-size:11px;font-weight:600;overflow:hidden;pointer-events:none;line-height:15px}
+.blk.busy{background:repeating-linear-gradient(135deg,#eef1f6 0 6px,#e5e9f1 6px 12px);color:var(--ink-muted)}
+.blk.mine{background:var(--brand-600);color:#fff;box-shadow:var(--shadow-pop)}
+.blk.bad{background:var(--danger);color:#fff}
+.sum .r{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px}
+.sum .r span:first-child{color:var(--ink-muted)}
+.dur{display:flex;gap:6px}
+.dur button{flex:1;height:36px;border-radius:10px;border:1.5px solid var(--line);background:#fff;font-weight:600;font-size:12px}
+.dur button.on{border-color:var(--brand-600);color:var(--brand-700);background:var(--brand-50)}
+.err{color:var(--danger);font-size:12px;display:flex;gap:6px;align-items:center;margin-top:6px}
+.labels{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.lab{border:1.5px dashed #b9c6de;border-radius:14px;padding:12px;display:flex;gap:12px;background:#fff}
+.lab .k{font-size:10px;color:var(--ink-muted);line-height:13px}
+.lab .v{font-size:12px;font-weight:600;line-height:16px;margin-bottom:3px}
+</style></head>
+<body>
+<div class="stage"><div class="web" id="scr" style="position:relative">
+  <aside class="side"><div class="brand"><span class="logo" id="lg"></span>CEDIS Flow</div><nav class="nav" id="nav"></nav>
+    <div style="margin-top:auto" class="card pad"><div class="row"><div class="avatar">PG</div><div class="grow"><div class="t-data ellip" style="font-size:13px">Papelera del Golfo</div><div class="t-cap">Proveedor</div></div></div></div></aside>
+  <section class="main"><header class="top"><h1 id="ttl"></h1><label class="field sm" style="width:260px"><span id="is"></span><input placeholder="Buscar OC o factura"></label><button class="iconbtn" id="bell" aria-label="Avisos"></button></header>
+    <div class="content" id="ct"></div></section>
+</div></div>
+<script>
+(function(){
+  var C=window.Cedis,$=function(i){return document.getElementById(i)};
+  $('lg').innerHTML=C.ic('cube',20,2.2); $('is').innerHTML=C.ic('search',18); $('bell').innerHTML=C.ic('bell');
+  var view='cita', day=1, dur=2, pick=null, fac='FAC-A-20418', usados=['FAC-A-20391','FAC-A-20402','FAC-A-20410'];
+  var ocs=[{id:'OC-26-1182',suc:'Suc. 07 Boca del Río',b:24},{id:'OC-26-1201',suc:'Suc. 04 Xalapa',b:16},{id:'OC-26-1207',suc:'Suc. 12 Córdoba',b:31}], oc=0;
+  var busy={1:[[0,0,2,'Atlas'],[1,2,3,'Escolar MX'],[2,4,2,'Sureste'],[3,0,4,'Atlas'],[0,6,2,'Escolar MX'],[2,10,3,'Atlas'],[3,12,2,'Sureste'],[1,14,4,'Atlas']],2:[[0,2,2,'Atlas'],[2,0,3,'Sureste']],3:[[1,4,2,'Escolar MX']],4:[],5:[[3,8,2,'Atlas']]};
+  var hist=[['18 nov','OC-26-1120','FAC-A-20391','R2',22,'ok','Completa'],['11 nov','OC-26-1094','FAC-A-20402','R1',18,'bad','1 rechazado'],['04 nov','OC-26-1071','FAC-A-20410','R4',30,'ok','Completa'],['28 oct','OC-26-1040','FAC-A-20377','R3',12,'warn','2 faltantes']];
+  var NAV=[['cita','calendar','Agendar cita'],['fac','file','Factura y bultos'],['hist','history','Historial']];
+  function nav(){ $('nav').innerHTML=NAV.map(function(n){return '<button class="'+(view===n[0]?'on':'')+'" data-v="'+n[0]+'">'+C.ic(n[1])+n[2]+'</button>'}).join(''); $('ttl').textContent=NAV.filter(function(n){return n[0]===view})[0][2]; }
+  $('nav').onclick=function(e){var b=e.target.closest('button');if(!b)return;view=b.dataset.v;render();};
+  var DN=['Mar','Mié','Jue','Vie','Sáb'], DD=[24,25,26,27,28];
+  function conflict(){ if(!pick)return false; return (busy[day]||[]).some(function(b){return b[0]===pick.a&&pick.s<b[1]+b[2]&&b[1]<pick.s+dur}) || pick.s+dur>20; }
+  function cita(){
+    var rows=''; for(var r=0;r<20;r++){ rows+='<div class="hr">'+(r%2===0?(8+r/2)+':00':'')+'</div>'; for(var a=0;a<4;a++) rows+='<div class="c '+(r%2===0?'hh':'')+'" data-a="'+a+'" data-s="'+r+'"></div>'; }
+    var bad=conflict(), facBad=usados.indexOf(fac.trim().toUpperCase())>=0||!fac.trim(), o=ocs[oc];
+    var hS=pick?(8+pick.s/2):0, fmt=function(h){return Math.floor(h)+':'+(h%1?'30':'00')};
+    $('ct').innerHTML='<div class="cols"><div style="display:flex;flex-direction:column;gap:14px">'+
+      '<div class="card pad"><span class="lbl" style="margin-top:0">Orden de compra</span><label class="field sm"><span>'+C.ic('file',18)+'</span><select id="oc">'+ocs.map(function(x,i){return '<option value="'+i+'" '+(i===oc?'selected':'')+'>'+x.id+' · '+x.suc+'</option>'}).join('')+'</select></label>'+
+      '<span class="lbl">Folio de factura</span><label class="field sm" style="'+(facBad?'border-color:var(--danger)':'')+'"><span>'+C.ic('qr',18)+'</span><input id="fac" value="'+fac+'"></label>'+(facBad?'<div class="err">'+C.ic('alert',14,2)+(fac.trim()?'Este folio ya está registrado':'El folio es obligatorio')+'</div>':'')+
+      '<span class="lbl">Tiempo estimado de descarga</span><div class="dur" id="dur">'+[[2,'1 h'],[3,'1.5 h'],[4,'2 h'],[6,'3 h']].map(function(d){return '<button data-d="'+d[0]+'" class="'+(dur===d[0]?'on':'')+'">'+d[1]+'</button>'}).join('')+'</div></div>'+
+      '<div class="card pad sum"><div class="t-sub" style="margin-bottom:4px">Resumen</div><div class="r"><span>Destino</span><b>'+o.suc+'</b></div><div class="r"><span>Bultos</span><b>'+o.b+'</b></div><div class="r"><span>Andén</span><b>'+(pick?'R'+(pick.a+1):'—')+'</b></div><div class="r"><span>Horario</span><b>'+(pick?DN[day-1]+' '+DD[day-1]+' · '+fmt(hS)+'–'+fmt(hS+dur/2):'—')+'</b></div>'+
+      '<button class="btn primary block" id="ok" style="margin-top:14px" '+(!pick||bad||facBad?'disabled':'')+'>'+C.ic('check',18)+'Confirmar cita</button>'+(bad?'<div class="err">'+C.ic('alert',14,2)+'Ese andén ya está ocupado</div>':'')+'</div></div>'+
+      '<div><div class="row" style="justify-content:space-between;align-items:flex-start"><div class="days" id="days">'+DN.map(function(d,i){return '<button data-d="'+(i+1)+'" class="'+(day===i+1?'on':'')+'">'+d+'<b>'+DD[i]+'</b></button>'}).join('')+'</div><div class="row t-cap" style="gap:14px;padding-top:6px"><span class="row" style="gap:6px"><i class="dot" style="color:#dfe4ee"></i>Ocupado</span><span class="row" style="gap:6px"><i class="dot" style="color:var(--brand-600)"></i>Tu cita</span></div></div>'+
+      '<div class="cal" id="cal"><div class="hd"></div>'+[0,1,2,3].map(function(a){return '<div class="hd">'+C.ic('warehouse',14,2)+'Andén R'+(a+1)+'</div>'}).join('')+rows+'</div></div></div>';
+    var cal=$('cal'), cw=(cal.clientWidth-52)/4;
+    (busy[day]||[]).forEach(function(b){add('busy',b[0],b[1],b[2],b[3])});
+    if(pick) add(bad?'bad':'mine',pick.a,pick.s,dur,ocs[oc].id);
+    function add(cls,a,s,d,t){var e=document.createElement('div');e.className='blk '+cls;e.style.left=(52+a*cw+4)+'px';e.style.width=(cw-8)+'px';e.style.top=(37+s*24+2)+'px';e.style.height=(Math.min(d,20-s)*24-4)+'px';e.textContent=t;cal.appendChild(e);}
+    cal.onclick=function(e){var c=e.target.closest('.c');if(!c)return;pick={a:+c.dataset.a,s:+c.dataset.s};render();};
+    $('days').onclick=function(e){var b=e.target.closest('button');if(!b)return;day=+b.dataset.d;pick=null;render();};
+    $('dur').onclick=function(e){var b=e.target.closest('button');if(!b)return;dur=+b.dataset.d;render();};
+    $('oc').onchange=function(){oc=+this.value;render();};
+    $('fac').onchange=function(){fac=this.value;render();};
+    $('ok').onclick=function(){ (busy[day]=busy[day]||[]).push([pick.a,pick.s,dur,ocs[oc].id]); hist.unshift([DD[day-1]+' nov',ocs[oc].id,fac.toUpperCase(),'R'+(pick.a+1),ocs[oc].b,'mute','Programada']); usados.push(fac.toUpperCase()); pick=null; C.toast($('scr'),'Cita confirmada · QR enviado','check'); render(); };
+  }
+  var bultos=[['B-0003','PAP-0100'],['B-0004','PAP-0100'],['B-0005','LAP-0012'],['B-0006','LAP-0012'],['B-0007','CLI-0100'],['B-0008','CLI-0100']];
+  function facv(){
+    var tk=0,tv=0; bultos.forEach(function(b){var p=C.bySku(b[1]);tk+=p.kg;tv+=p.m3});
+    $('ct').innerHTML='<div class="kpis">'+[['file','Factura','FAC-A-20418'],['box','Bultos',bultos.length+' de 24'],['weight','Peso',C.kg(tk)],['cube','Volumen',tv.toFixed(3)+' m³']].map(function(k){return '<div class="card kpi"><span class="ic">'+C.ic(k[0],22)+'</span><div><div class="t-cap">'+k[1]+'</div><div class="t-data">'+k[2]+'</div></div></div>'}).join('')+'</div>'+
+      '<div class="card" style="overflow:hidden;margin-bottom:18px"><div class="row pad" style="padding-bottom:10px"><div class="t-sub grow">Desglose por bulto</div><span class="chip mute">'+C.ic('box',14,2)+'Un producto por bulto</span><button class="btn soft sm" id="add">'+C.ic('plus',16)+'Bulto</button><button class="btn primary sm" id="all">'+C.ic('download',16)+'Etiquetas (PDF)</button></div>'+
+      '<table class="tbl"><tr><th>Bulto</th><th>Producto</th><th>SKU</th><th>Piezas</th><th>Peso</th><th>Volumen</th><th></th></tr>'+bultos.map(function(b){var p=C.bySku(b[1]);return '<tr><td><b>'+b[0]+'</b></td><td><div class="row" style="gap:10px"><span class="thumb" style="width:34px;height:34px">'+'<img src="'+C.A[p.img]+'" alt=""></span>'+p.nombre+'</div></td><td>'+p.sku+'</td><td>'+p.porBulto+' '+p.unidad+'</td><td>'+C.kg(p.kg)+'</td><td>'+p.m3.toFixed(3)+' m³</td><td><button class="iconbtn ghost" aria-label="Etiqueta">'+C.ic('qr',18)+'</button></td></tr>'}).join('')+'</table></div>'+
+      '<div class="t-over" style="margin-bottom:10px">Vista de etiquetas</div><div class="labels">'+bultos.slice(0,3).map(function(b){var p=C.bySku(b[1]);return '<div class="lab">'+C.qr(b[0]+'OC-26-1182'+b[1],84)+'<div><div class="k">Bulto</div><div class="v">'+b[0]+'</div><div class="k">OC · Sucursal</div><div class="v">OC-26-1182 · Suc. 07</div><div class="k">SKU · Piezas</div><div class="v">'+p.sku+' · '+p.porBulto+'</div></div></div>'}).join('')+'</div>';
+    $('all').onclick=function(){C.toast($('scr'),'24 etiquetas listas para imprimir','download')};
+    $('add').onclick=function(){bultos.push(['B-00'+(bultos.length+3<10?'0':'')+(bultos.length+3),'CLI-0100']);facv();};
+  }
+  function histv(){
+    $('ct').innerHTML='<div class="kpis">'+[['truck','Entregas este mes','12'],['check','A tiempo','92%'],['alert','Con incidencia','2'],['clock','Descarga promedio','1 h 20 m']].map(function(k){return '<div class="card kpi"><span class="ic">'+C.ic(k[0],22)+'</span><div><div class="t-cap">'+k[1]+'</div><div class="t-data">'+k[2]+'</div></div></div>'}).join('')+'</div>'+
+      '<div class="card" style="overflow:hidden"><table class="tbl"><tr><th>Fecha</th><th>Orden de compra</th><th>Factura</th><th>Andén</th><th>Bultos</th><th>Estado</th></tr>'+hist.map(function(h){return '<tr><td>'+h[0]+'</td><td><b>'+h[1]+'</b></td><td>'+h[2]+'</td><td>'+h[3]+'</td><td>'+h[4]+'</td><td><span class="chip '+h[5]+'"><span class="dot"></span>'+h[6]+'</span></td></tr>'}).join('')+'</table></div>';
+  }
+  function render(){nav(); if(view==='cita')cita(); else if(view==='fac')facv(); else histv();}
+  render();
+})();
+</script>
+</body>
+</html>

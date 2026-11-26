@@ -1,0 +1,66 @@
+# Revisa rama, título, commits y archivos de cada PR (docs/scrum.md · Coordinación entre áreas).
+#
+# El revisor se corre desde la rama base, no desde el PR (issue #7): así funciona con ramas que
+# salieron de `dev` antes de que existiera y un PR no puede cambiar las reglas que lo revisan.
+# La única excepción es un PR de DevOps que cambia el propio revisor: DevOps es su dueño y la
+# versión nueva se prueba en el job `github` del CI.
+name: Convenciones
+
+on:
+  pull_request:
+    branches: [dev, main]
+    types: [opened, edited, synchronize, reopened, labeled, unlabeled]
+
+concurrency:
+  group: convenciones-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  convenciones:
+    name: convenciones
+    runs-on: ubuntu-latest
+    steps:
+      # Cambios del PR: archivos y commits se calculan con el head.
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+      # Revisor: el de la rama base.
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: .revisor
+          sparse-checkout: .github/scripts
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Elegir la versión del revisor
+        id: revisor
+        env:
+          PR_BASE: ${{ github.event.pull_request.base.ref }}
+          PR_HEAD: ${{ github.event.pull_request.head.ref }}
+          PR_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          carpeta=.revisor/.github/scripts
+          if [[ "$PR_HEAD" == devops-* ]] &&
+             git diff --name-only "origin/$PR_BASE...$PR_SHA" | grep -q '^\.github/scripts/'; then
+            carpeta=.github/scripts
+            echo "::notice::El PR de DevOps cambia el revisor: se usa su versión."
+          fi
+          if [[ ! -f "$carpeta/convenciones.py" ]]; then
+            echo "::notice::La rama base aún no tiene el revisor: se omite la revisión."
+            carpeta=
+          fi
+          echo "carpeta=$carpeta" >> "$GITHUB_OUTPUT"
+      - name: Revisar el PR
+        if: steps.revisor.outputs.carpeta != ''
+        env:
+          PR_BASE: ${{ github.event.pull_request.base.ref }}
+          PR_HEAD: ${{ github.event.pull_request.head.ref }}
+          PR_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_TITULO: ${{ github.event.pull_request.title }}
+          PR_ETIQUETAS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
+        run: python "${{ steps.revisor.outputs.carpeta }}/convenciones.py"

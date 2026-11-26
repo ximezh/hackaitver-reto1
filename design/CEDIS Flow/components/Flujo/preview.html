@@ -1,0 +1,70 @@
+<!-- @dsCard group="Fundamentos" height=640 width=1000 subtitle="El proceso de punta a punta y qué pantalla cubre cada paso" -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Flujo</title>
+<style>
+.fl{width:960px;margin:0 auto;padding:20px;background:#fff;border-radius:20px;border:1px solid var(--line);position:relative}
+.nodes{position:relative;height:250px}
+.node{position:absolute;top:30px;width:200px;display:flex;flex-direction:column;align-items:center;gap:6px;transition:.25s}
+.node .im{width:170px;height:140px;border-radius:24px;background:var(--brand-50);display:grid;place-items:center;border:2px solid transparent;transition:.25s}
+.node .im img{width:150px;height:126px;object-fit:contain}
+.node.on .im{border-color:var(--brand-600);box-shadow:0 0 0 6px var(--brand-50)}
+.node .tag{display:flex;align-items:center;gap:8px;font-weight:600}
+.node .tag i{width:28px;height:28px;border-radius:8px;background:var(--brand-600);color:#fff;font-style:normal;display:grid;place-items:center;font-size:14px}
+svg.ar{position:absolute;inset:0;pointer-events:none;overflow:visible}
+svg.ar path{fill:none;stroke:#c9d5ec;stroke-width:3;stroke-linecap:round;transition:.25s}
+svg.ar path.on{stroke:var(--brand-600);stroke-width:4;stroke-dasharray:10 8;animation:dash 1s linear infinite}
+@keyframes dash{to{stroke-dashoffset:-18}}
+svg.ar text{font:600 12px Poppins,sans-serif;fill:var(--ink-muted)}
+svg.ar text.on{fill:var(--brand-700)}
+.steps{display:flex;gap:8px;margin-top:6px}
+.steps button{flex:1;border:1.5px solid var(--line);background:#fff;border-radius:14px;padding:10px 8px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;font-weight:600;color:var(--ink-muted)}
+.steps button b{width:24px;height:24px;border-radius:50%;background:var(--surface-50);display:grid;place-items:center;font-size:12px}
+.steps button.on{border-color:var(--brand-600);color:var(--brand-700);background:var(--brand-50)}
+.steps button.on b{background:var(--brand-600);color:#fff}
+.det{margin-top:12px;display:flex;gap:14px;align-items:center;padding:14px 16px;border-radius:16px;background:var(--surface-50)}
+.det .chip{height:30px}
+.mo{position:absolute;right:20px;top:20px}
+</style></head>
+<body>
+<div class="stage"><div class="fl">
+  <div class="row"><div class="grow"><div class="t-over">De la orden de compra al embarque</div><div class="t-title">Flujo de la operación</div></div><button class="btn soft sm" id="play"></button></div>
+  <div class="nodes" id="nodes"></div>
+  <div class="steps" id="steps"></div>
+  <div class="det" id="det"></div>
+</div></div>
+<script>
+(function(){
+  var C=window.Cedis,$=function(i){return document.getElementById(i)};
+  var N={S:{x:40,n:'Sucursal',img:C.A.sucursal},C:{x:380,n:'CEDIS',img:C.A.cedis},P:{x:720,n:'Proveedor',img:C.A.anden}};
+  var cx=function(k){return N[k].x+100};
+  var S=[
+    {t:'Pedido',from:'S',to:'C',lab:'OC (orden de compra)',low:1,m:'',who:['store','Sucursal · Pedir'],more:[['cart','La sucursal arma su pedido por bultos']]},
+    {t:'Requerimiento',from:'C',to:'P',lab:'Orden de requerimiento',low:1,m:'',who:['grid','Oficina'],more:[['file','La OC llega al proveedor con su destino']]},
+    {t:'Agendamiento',from:'P',to:'C',lab:'Cita en andén',low:0,m:'Momento 1',who:['factory','Proveedor · Agendar cita'],more:[['clock','Caseta · Check-in']]},
+    {t:'Identificación',from:'P',to:'P',lab:'',m:'Momento 2',who:['factory','Proveedor · Factura y bultos'],more:[['qr','Etiqueta QR por bulto'],['box','Bulto (vista visual)']]},
+    {t:'Recepción',from:'C',to:'C',lab:'',m:'Momento 3',who:['scan','Sup. desembarque'],more:[['check','Escaneo contra la OC'],['x','No se recibe lo no solicitado']]},
+    {t:'Almacenaje y embarque',from:'C',to:'S',lab:'Envío',low:0,m:'Momento 4',who:['pallet','Tarima 3D'],more:[['truck','Sup. embarque · 90%'],['printer','Relación de embarque'],['exit','Caseta · Check-out']]}];
+  var cur=0, timer=null;
+  function draw(){ var s=S[cur];
+    var on={}; on[s.from]=1; on[s.to]=1;
+    var html='<svg class="ar" width="920" height="250">';
+    [[0,'S','C',1,'OC (orden de compra)'],[1,'C','P',1,'Orden de requerimiento'],[2,'P','C',0,'Cita'],[5,'C','S',0,'Envío']].forEach(function(a){
+      var x1=cx(a[1])+(a[3]?40:-40)*(cx(a[2])>cx(a[1])?1:-1)*-1, x2=cx(a[2]), y=a[3]?215:30, dir=cx(a[2])>cx(a[1])?1:-1;
+      var sx=cx(a[1])+dir*50, ex=cx(a[2])-dir*50, my=a[3]?250:-10;
+      var d='M'+sx+' '+(a[3]?185:60)+' Q'+((sx+ex)/2)+' '+my+' '+ex+' '+(a[3]?185:60);
+      var o=a[0]===cur; html+='<path class="'+(o?'on':'')+'" d="'+d+'" marker-end="url(#m'+(o?1:0)+')"/><text class="'+(o?'on':'')+'" x="'+((sx+ex)/2)+'" y="'+(a[3]?242:14)+'" text-anchor="middle">'+a[4]+'</text>'; });
+    html+='<defs><marker id="m0" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#c9d5ec" stroke="none"/></marker><marker id="m1" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#1f5fd6" stroke="none"/></marker></defs></svg>';
+    html+=Object.keys(N).map(function(k){return '<div class="node '+(on[k]?'on':'')+'" style="left:'+N[k].x+'px"><div class="im"><img src="'+N[k].img+'" alt=""></div><div class="tag"><i>'+k+'</i>'+N[k].n+'</div></div>'}).join('');
+    $('nodes').innerHTML=html;
+    $('steps').innerHTML=S.map(function(x,i){return '<button class="'+(i===cur?'on':'')+'" data-i="'+i+'"><b>'+(i+1)+'</b>'+x.t+'</button>'}).join('');
+    $('det').innerHTML=(s.m?'<span class="chip">'+s.m+'</span>':'<span class="chip mute">Previo</span>')+'<span class="chip ok" style="background:var(--brand-600);color:#fff">'+C.ic(s.who[0],16,2)+s.who[1]+'</span>'+s.more.map(function(m){return '<span class="chip mute">'+C.ic(m[0],16,2)+m[1]+'</span>'}).join('');
+  }
+  $('steps').onclick=function(e){var b=e.target.closest('button');if(!b)return;stop();cur=+b.dataset.i;draw();};
+  function stop(){clearInterval(timer);timer=null;$('play').innerHTML=C.ic('right',16)+'Reproducir';}
+  $('play').onclick=function(){ if(timer){stop();return;} $('play').innerHTML=C.ic('x',16)+'Detener'; timer=setInterval(function(){cur=(cur+1)%S.length;draw();},1800); };
+  stop(); draw();
+})();
+</script>
+</body>
+</html>
