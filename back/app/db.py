@@ -37,4 +37,10 @@ def get_engine(url: str | None = None) -> Engine:
 def get_session() -> Iterator[Session]:
     factory = sessionmaker(bind=get_engine(), expire_on_commit=False)
     with factory() as session:
-        yield session
+        try:
+            yield session
+        except Exception:
+            # Por ejemplo, un `IntegrityError` al guardar: el manejador de errores responde
+            # con el `code` del contrato y la sesión no se queda a medias.
+            session.rollback()
+            raise
