@@ -1,4 +1,5 @@
-# Integración continua de front y back.
+# Integración continua de front y back. En los push a `dev` y `main`, si todo pasa, publica las
+# imágenes que toma la instancia (DO-13): staging sigue a `dev` y producción a `main`.
 # Cada parte corre solo si cambió algo en su carpeta. El job `ci` siempre corre y resume
 # el resultado: es el único check que se marca como obligatorio en `dev` y `main`.
 name: CI
@@ -163,3 +164,32 @@ jobs:
               exit 1
             fi
           done
+
+  publicar:
+    name: Publicar imágenes
+    needs: ci
+    if: github.event_name == 'push' && needs.ci.result == 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      matrix:
+        parte: [back, front]
+    env:
+      IMAGEN: ghcr.io/ximezh/hackaitver-reto1-${{ matrix.parte }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Iniciar sesión en GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+      # La instancia busca la etiqueta sha-<commit> (infra/actualizar.sh).
+      - name: Construir y publicar
+        run: |
+          entorno=$([ "${{ github.ref_name }}" = main ] && echo produccion || echo staging)
+          docker build \
+            --label org.opencontainers.image.source=https://github.com/${{ github.repository }} \
+            --label org.opencontainers.image.revision=${{ github.sha }} \
+            -t "$IMAGEN:sha-${{ github.sha }}" -t "$IMAGEN:$entorno" ${{ matrix.parte }}/
+          docker push "$IMAGEN:sha-${{ github.sha }}"
+          docker push "$IMAGEN:$entorno"
+          echo "Publicada $IMAGEN:sha-${{ github.sha }} ($entorno)" >> "$GITHUB_STEP_SUMMARY"
