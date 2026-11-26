@@ -19,7 +19,7 @@ import re
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from app.tiempo import ahora
+from app import tiempo
 
 CLAVES_DE_SUCURSAL = [f"{n:02d}" for n in range(1, 33)]  # una por rack (R-15)
 SECUENCIAS = [
@@ -36,7 +36,7 @@ def _siguiente(session: Session, secuencia: str) -> int:
 
 def folio_oc(session: Session) -> str:
     """`OC-<aa>-<n>`: el año es el de la operación en México; el número no se reinicia."""
-    return f"OC-{ahora():%y}-{_siguiente(session, 'folio_oc'):04d}"
+    return f"OC-{tiempo.ahora():%y}-{_siguiente(session, 'folio_oc'):04d}"
 
 
 def folio_bulto(session: Session) -> str:

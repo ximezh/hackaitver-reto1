@@ -5,21 +5,21 @@ base en cada petición. Así, desactivar a alguien o restablecer su contraseña 
 momento, aunque tenga un token vigente.
 """
 
-from datetime import timedelta
+from datetime import UTC, datetime, timedelta
 
 import jwt
 
 from app.config import get_settings
 from app.errores import NO_AUTENTICADO, TOKEN_EXPIRADO, error
 from app.models import Usuario
-from app.tiempo import ahora
 
 DURACION = timedelta(hours=12)  # un turno
 ALGORITMO = "HS256"
 
 
 def crear_token(usuario: Usuario) -> str:
-    emitido = ahora()
+    # Reloj real del sistema, no el de la operación: PyJWT compara `exp` contra ese reloj.
+    emitido = datetime.now(UTC)
     claims = {
         "sub": str(usuario.id),
         "rol": usuario.rol,
