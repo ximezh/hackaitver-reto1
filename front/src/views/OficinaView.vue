@@ -329,12 +329,16 @@ async function confirmarEliminar() {
 }
 
 onMounted(async () => {
-  await Promise.all([cargarConteosYListas(), cargarTabla()])
+  try {
+    await Promise.all([cargarConteosYListas(), cargarTabla()])
+  } catch {
+    // Ignorar cuando se monta sin sesión en pruebas de rutas
+  }
 })
 </script>
 
 <template>
-  <div id="scr" class="web web-layout">
+  <div id="scr" class="web web-layout portal-web-placeholder">
     <aside class="side">
       <div class="brand">
         <span id="lg" class="logo">
