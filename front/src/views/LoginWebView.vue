@@ -1,6 +1,5 @@
 <script setup>
-import { computed, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed, getCurrentInstance, ref } from 'vue'
 import { iniciarSesion } from '@/api'
 import Icono from '@/components/Icono.vue'
 import { useToast } from '@/composables/useToast'
@@ -49,7 +48,7 @@ const RUTAS_ROL = {
   embarque: '/movil/embarque',
 }
 
-const router = useRouter()
+const router = getCurrentInstance()?.appContext.config.globalProperties.$router
 const { visible, mensaje, icono, mostrar } = useToast()
 
 const indiceRol = ref(0)
@@ -82,7 +81,7 @@ async function entrar() {
 </script>
 
 <template>
-  <div class="stage">
+  <div class="stage login-web-placeholder">
     <div id="scr" class="lw">
       <div class="art">
         <div class="brand" style="color: #fff; padding: 0">

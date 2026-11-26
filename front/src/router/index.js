@@ -3,6 +3,12 @@ import { haySesion } from '@/api'
 import LayoutMovil from '@/layouts/LayoutMovil.vue'
 import LayoutWeb from '@/layouts/LayoutWeb.vue'
 import { obtenerRutaInicioRol, useSesionStore } from '@/stores/sesion'
+import ElementosView from '../views/ElementosView.vue'
+import LoginMovilView from '../views/LoginMovilView.vue'
+import LoginWebView from '../views/LoginWebView.vue'
+import OficinaView from '../views/OficinaView.vue'
+import PortalMovilView from '../views/PortalMovilView.vue'
+import PortalWebView from '../views/PortalWebView.vue'
 
 export function crearRutas({ esDev = import.meta.env.DEV } = {}) {
   return [
@@ -14,13 +20,13 @@ export function crearRutas({ esDev = import.meta.env.DEV } = {}) {
       path: '/login',
       name: 'login',
       meta: { publica: true, canal: 'web' },
-      component: () => import('../views/LoginWebView.vue'),
+      component: LoginWebView,
     },
     {
       path: '/movil/login',
       name: 'movil-login',
       meta: { publica: true, canal: 'android' },
-      component: () => import('../views/LoginMovilView.vue'),
+      component: LoginMovilView,
     },
     {
       path: '/movil',
@@ -31,25 +37,25 @@ export function crearRutas({ esDev = import.meta.env.DEV } = {}) {
           path: 'caseta',
           name: 'movil-caseta',
           meta: { rol: 'caseta', canal: 'android' },
-          component: () => import('../views/PortalMovilView.vue'),
+          component: PortalMovilView,
         },
         {
           path: 'desembarque',
           name: 'movil-desembarque',
           meta: { rol: 'desembarque', canal: 'android' },
-          component: () => import('../views/PortalMovilView.vue'),
+          component: PortalMovilView,
         },
         {
           path: 'embarque',
           name: 'movil-embarque',
           meta: { rol: 'embarque', canal: 'android' },
-          component: () => import('../views/PortalMovilView.vue'),
+          component: PortalMovilView,
         },
         {
           path: ':ruta(.*)*',
           name: 'movil',
           meta: { canal: 'android' },
-          component: () => import('../views/PortalMovilView.vue'),
+          component: PortalMovilView,
         },
       ],
     },
@@ -62,25 +68,25 @@ export function crearRutas({ esDev = import.meta.env.DEV } = {}) {
           path: 'oficina',
           name: 'web-oficina',
           meta: { rol: 'oficina', canal: 'web' },
-          component: () => import('../views/OficinaView.vue'),
+          component: OficinaView,
         },
         {
           path: 'sucursal',
           name: 'web-sucursal',
           meta: { rol: 'sucursal', canal: 'web' },
-          component: () => import('../views/PortalWebView.vue'),
+          component: PortalWebView,
         },
         {
           path: 'proveedor',
           name: 'web-proveedor',
           meta: { rol: 'proveedor', canal: 'web' },
-          component: () => import('../views/PortalWebView.vue'),
+          component: PortalWebView,
         },
         {
           path: ':ruta(.*)*',
           name: 'web',
           meta: { canal: 'web' },
-          component: () => import('../views/PortalWebView.vue'),
+          component: PortalWebView,
         },
       ],
     },
@@ -90,7 +96,7 @@ export function crearRutas({ esDev = import.meta.env.DEV } = {}) {
             path: '/elementos',
             name: 'elementos',
             meta: { publica: true },
-            component: () => import('../views/ElementosView.vue'),
+            component: ElementosView,
           },
         ]
       : []),

@@ -117,3 +117,51 @@ export function formatoKg(n) {
 }
 
 export const kg = formatoKg
+
+export const ROLES_MOVIL = {
+  caseta: {
+    n: 'Caseta',
+    i: 'clock',
+    u: 'caseta.jlopez',
+    ruta: '/movil/caseta',
+    m: [
+      ['login', 'Check-in'],
+      ['exit', 'Check-out'],
+      ['calendar', 'Citas'],
+    ],
+  },
+  desembarque: {
+    n: 'Sup. desembarque',
+    s: 'Desembarque',
+    i: 'scan',
+    u: 'desem.mruiz',
+    ruta: '/movil/desembarque',
+    m: [
+      ['scan', 'Escanear'],
+      ['box', 'Bultos'],
+      ['pallet', 'Tarima 3D'],
+    ],
+  },
+  embarque: {
+    n: 'Sup. embarque',
+    s: 'Embarque',
+    i: 'truck',
+    u: 'embar.acruz',
+    ruta: '/movil/embarque',
+    m: [
+      ['truck', 'Camiones'],
+      ['pallet', 'Tarimas'],
+      ['printer', 'Relación'],
+    ],
+  },
+}
+
+export function detectarRolMovil(valor) {
+  const v = String(valor ?? '')
+    .trim()
+    .toLowerCase()
+  if (v.startsWith('caseta.')) return 'caseta'
+  if (v.startsWith('desem.')) return 'desembarque'
+  if (v.startsWith('embar.')) return 'embarque'
+  return null
+}

@@ -1,10 +1,9 @@
 <script setup>
-import { computed, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed, getCurrentInstance, ref } from 'vue'
 import { cerrarSesion, iniciarSesion } from '@/api'
 import Icono from '@/components/Icono.vue'
 import { useToast } from '@/composables/useToast'
-import { ILUSTRACIONES } from '@/utils/cedis'
+import { ILUSTRACIONES, ROLES_MOVIL, detectarRolMovil } from '@/utils/cedis'
 
 defineOptions({
   name: 'LoginMovilView',
@@ -17,55 +16,7 @@ const props = defineProps({
   },
 })
 
-export const ROLES_MOVIL = {
-  caseta: {
-    n: 'Caseta',
-    i: 'clock',
-    u: 'caseta.jlopez',
-    ruta: '/movil/caseta',
-    m: [
-      ['login', 'Check-in'],
-      ['exit', 'Check-out'],
-      ['calendar', 'Citas'],
-    ],
-  },
-  desembarque: {
-    n: 'Sup. desembarque',
-    s: 'Desembarque',
-    i: 'scan',
-    u: 'desem.mruiz',
-    ruta: '/movil/desembarque',
-    m: [
-      ['scan', 'Escanear'],
-      ['box', 'Bultos'],
-      ['pallet', 'Tarima 3D'],
-    ],
-  },
-  embarque: {
-    n: 'Sup. embarque',
-    s: 'Embarque',
-    i: 'truck',
-    u: 'embar.acruz',
-    ruta: '/movil/embarque',
-    m: [
-      ['truck', 'Camiones'],
-      ['pallet', 'Tarimas'],
-      ['printer', 'Relación'],
-    ],
-  },
-}
-
-export function detectarRolMovil(valor) {
-  const v = String(valor ?? '')
-    .trim()
-    .toLowerCase()
-  if (v.startsWith('caseta.')) return 'caseta'
-  if (v.startsWith('desem.')) return 'desembarque'
-  if (v.startsWith('embar.')) return 'embarque'
-  return null
-}
-
-const router = useRouter()
+const router = getCurrentInstance()?.appContext.config.globalProperties.$router
 const { visible, mensaje, icono, mostrar } = useToast()
 
 const usuario = ref('')
@@ -119,7 +70,7 @@ function salir() {
 </script>
 
 <template>
-  <div id="scr" class="screen screen-movil">
+  <div id="scr" class="screen screen-movil login-movil-placeholder">
     <div class="hero">
       <img id="heroImg" :src="ILUSTRACIONES.login" alt="Ilustración de acceso" />
     </div>
