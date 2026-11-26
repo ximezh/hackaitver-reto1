@@ -7,7 +7,7 @@
 #
 # Pasos:
 #   1. Si la rama del entorno no avanzó desde el último despliegue, termina.
-#   2. Espera las imágenes `sha-<commit>` que publica el workflow «Publicar» solo cuando el CI
+#   2. Espera las imágenes `sha-<commit>` que publica el job «Publicar imágenes» del CI solo cuando
 #      pasa. Si el CI falló, nunca aparecen y el entorno sigue con la versión anterior.
 #   3. Corre las migraciones, levanta la versión nueva y revisa /api/health a través de Nginx.
 #   4. Si algo falla, vuelve a levantar la versión anterior.

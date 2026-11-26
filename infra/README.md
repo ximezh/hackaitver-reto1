@@ -68,7 +68,7 @@ En producción no se cargan semillas.
 
 `main` es producción y `dev` es staging (A-15). Nadie despliega a mano:
 
-1. Un merge a `dev` o `main` corre el CI. Si pasa, el workflow [Publicar](../.github/workflows/publicar.yml) sube a GHCR las imágenes `ghcr.io/ximezh/hackaitver-reto1-back` y `-front` con la etiqueta `sha-<commit>`.
+1. Un merge a `dev` o `main` corre el CI. Si pasa, el job «Publicar imágenes» de [ci.yml](../.github/workflows/ci.yml) sube a GHCR las imágenes `ghcr.io/ximezh/hackaitver-reto1-back` y `-front` con la etiqueta `sha-<commit>`.
 2. En la instancia, un timer corre [actualizar.sh](actualizar.sh) cada minuto por entorno. Si la rama avanzó y ya están sus imágenes, corre las migraciones, levanta la versión nueva y revisa `/api/health` a través de Nginx.
 3. Si la versión nueva no responde, vuelve a levantar la anterior y no reintenta ese commit; el siguiente commit sí se intenta. Si el CI falló, las imágenes nunca se publican y el entorno no cambia.
 
