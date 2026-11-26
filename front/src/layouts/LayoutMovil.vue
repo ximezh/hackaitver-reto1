@@ -1,7 +1,10 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, getCurrentInstance } from 'vue'
+import { RouterView } from 'vue-router'
 import Icono from '@/components/Icono.vue'
 import { useToast } from '@/composables/useToast'
+
+const tieneRouter = Boolean(getCurrentInstance()?.appContext.config.globalProperties.$router)
 
 defineOptions({
   name: 'LayoutMovil',
@@ -123,7 +126,9 @@ const tieneFab = computed(() => props.mostrarFab || Boolean(props.fabIcono))
     </header>
 
     <main class="scroll">
-      <slot />
+      <slot>
+        <RouterView v-if="tieneRouter" />
+      </slot>
     </main>
 
     <slot name="fab">

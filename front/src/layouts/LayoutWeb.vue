@@ -1,7 +1,10 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, getCurrentInstance } from 'vue'
+import { RouterView } from 'vue-router'
 import Icono from '@/components/Icono.vue'
 import { useToast } from '@/composables/useToast'
+
+const tieneRouter = Boolean(getCurrentInstance()?.appContext.config.globalProperties.$router)
 
 defineOptions({
   name: 'LayoutWeb',
@@ -159,7 +162,9 @@ const avisoIcono = computed(() => props.toastIcono ?? icono.value)
       </header>
 
       <div class="content">
-        <slot />
+        <slot>
+          <RouterView v-if="tieneRouter" />
+        </slot>
       </div>
     </section>
 

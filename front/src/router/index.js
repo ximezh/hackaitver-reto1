@@ -1,17 +1,44 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import LayoutMovil from '@/layouts/LayoutMovil.vue'
+import LayoutWeb from '@/layouts/LayoutWeb.vue'
 
 export function crearRutas({ esDev = import.meta.env.DEV } = {}) {
   return [
     {
       path: '/',
-      name: 'home',
-      component: HomeView,
+      redirect: '/login',
     },
     {
-      path: '/about',
-      name: 'about',
-      component: () => import('../views/AboutView.vue'),
+      path: '/login',
+      name: 'login',
+      component: () => import('../views/LoginWebView.vue'),
+    },
+    {
+      path: '/movil/login',
+      name: 'movil-login',
+      component: () => import('../views/LoginMovilView.vue'),
+    },
+    {
+      path: '/movil',
+      component: LayoutMovil,
+      children: [
+        {
+          path: ':ruta(.*)*',
+          name: 'movil',
+          component: () => import('../views/PortalMovilView.vue'),
+        },
+      ],
+    },
+    {
+      path: '/web',
+      component: LayoutWeb,
+      children: [
+        {
+          path: ':ruta(.*)*',
+          name: 'web',
+          component: () => import('../views/PortalWebView.vue'),
+        },
+      ],
     },
     ...(esDev
       ? [
