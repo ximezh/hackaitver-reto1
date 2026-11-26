@@ -5,6 +5,7 @@ from sqlalchemy import Engine, MetaData, create_engine
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
 from app.config import get_settings
+from app.tiempo import ZONA_NOMBRE
 
 # Nombres fijos para índices y restricciones: Alembic los genera igual en cada máquina y la API
 # puede reconocer qué regla falló (por ejemplo `uq_productos_sku`).
@@ -25,7 +26,12 @@ class Base(DeclarativeBase):
 
 @lru_cache
 def get_engine(url: str | None = None) -> Engine:
-    return create_engine(url or get_settings().database_url, pool_pre_ping=True)
+    return create_engine(
+        url or get_settings().database_url,
+        pool_pre_ping=True,
+        # La sesión usa la zona de la operación: `now()::date` es el día del CEDIS.
+        connect_args={"options": f"-c timezone={ZONA_NOMBRE}"},
+    )
 
 
 def get_session() -> Iterator[Session]:

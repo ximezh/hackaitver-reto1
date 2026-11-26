@@ -76,8 +76,23 @@ Todo error responde con la misma forma:
 | 403 | `sin_permiso` | No tienes acceso a esta sección | El rol no puede usar la ruta |
 | 403 | `cambio_contrasena_requerido` | Cambia tu contraseña para continuar | La contraseña es temporal (R-17) |
 | 404 | `no_encontrado` | No encontramos el registro | El `id` o folio no existe |
+| 405 | `metodo_no_permitido` | Esta acción no está disponible | La ruta existe, pero no con ese método |
 | 409 | según el caso | según el caso | Duplicados, recurso ocupado o conflicto de estado |
+| 409 | `conflicto` | No se pudo guardar porque choca con otro registro | Restricción de la base sin un `code` propio |
 | 422 | `validacion` | Mensaje del primer campo | Cuerpo o parámetros inválidos |
 | 500 | `error_interno` | Algo salió mal. Intenta de nuevo | Error no previsto; el detalle queda en el log |
 
 Cada contrato lista los `code` propios de sus rutas.
+
+### Folios
+
+| Folio | Formato | Ejemplo |
+|---|---|---|
+| Orden de compra | `OC-<aa>-<n>`, con el año de la operación en México | `OC-26-1182` |
+| Bulto | `B-<n>` | `B-0003` |
+| Tarima | `T-<clave de sucursal>-<n>`, numerada por sucursal | `T-07-03` |
+| Embarque | `EMB-<n>` | `EMB-0412` |
+| Factura | La captura el proveedor; el back no la genera (R-04) | `FAC-A-20418` |
+
+- El número tiene al menos 4 dígitos (2 en las tarimas) y crece si hace falta: `B-10000`.
+- No se repiten. Puede haber huecos si una operación se cancela.
