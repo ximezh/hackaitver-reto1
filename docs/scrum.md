@@ -12,6 +12,27 @@ Cada desarrollador trabaja con su agente sobre su propio archivo. Ninguna histor
 
 ---
 
+## Ruta crítica de la entrega (2026-11-25)
+
+Quedan ~45 minutos. Todo lo que no está en esta tabla sale de la entrega y pasa al backlog. **Demo objetivo, en producción:** Oficina entra y administra catálogos → Sucursal arma un pedido → Proveedor agenda su cita sin empalmes.
+
+| Tiempo | Front (Ximena) | Back (Jesus) | DevOps (Luis Daniel) |
+|---|---|---|---|
+| 0–10 min | Cerrar sprint 1 (FE-10…14) y abrir PR a `dev` | Terminar **BE-22** (citas por andén) y abrir PR a `dev` | **DO-20**: servicios y mocks de pedidos, órdenes, disponibilidad y citas en `@/api` |
+| 10–30 min | **FE-22** Agendar cita y, si alcanza, **FE-20** Pedir, contra `@/api` (con mocks si el back no ha entrado) | BE-23 solo si BE-22 ya está en `dev`; si no, corregir lo que reporte front | Merge de PRs en cuanto pasen los checks; probar cada merge en staging |
+| **30 min** | **Congelamiento:** nada nuevo entra a `dev` | **Congelamiento** | **Congelamiento** |
+| 30–40 min | Probar la demo en staging y avisar errores | Corregir solo errores que bloqueen la demo | PR #16 `dev` → `main`; producción se despliega sola (~5 min: CI, publicación y timer) |
+| 40–45 min | — | Semillas de demostración en producción | Verificar producción, credenciales de demo y entregar URL |
+
+**Reglas mientras dure la ruta crítica**
+
+- Un PR por área con lo que esté listo; el merge se hace apenas pasan `ci` y `convenciones`. Sin rediseños ni refactors.
+- Si algo no queda a tiempo, se entrega con mocks (`VITE_API_MOCK`) antes que romper la demo.
+- Avisos solo en los buzones (`docs/AVISOS-<área>.md`) o en el canal del equipo; nada de issues nuevos.
+- **Fuera de la entrega:** sprints 3 a 5 (caseta, recepción, tarima, embarque, complementos), DO-21…23, DO-30…51, FE-23 en adelante, BE-24 en adelante.
+
+---
+
 ## 1. Regla del prototipo
 
 **El diseño del prototipo no se modifica.** La interfaz debe quedar idéntica a [`design/CEDIS Flow/`](../design/CEDIS%20Flow/): pantallas, textos, colores, tamaños, espacios, íconos, ilustraciones y animaciones.
