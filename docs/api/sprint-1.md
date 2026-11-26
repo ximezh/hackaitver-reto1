@@ -269,6 +269,10 @@ El prototipo no dice qué proveedor surte cada producto. La asignación de los e
 | 422 | `validacion` | Las piezas por bulto deben ser mayores a 0 | `piezas_por_bulto` ≤ 0 |
 | 422 | `validacion` | El peso debe ser mayor a 0 | `kg` ≤ 0 |
 | 422 | `validacion` | El volumen debe ser mayor a 0 | `m3` ≤ 0 |
+| 422 | `validacion` | El peso no puede pasar de 1,000 kg, la capacidad de una tarima | `kg` > 1000 (R-09) |
+| 422 | `validacion` | El volumen no puede pasar de 2.576 m³, la capacidad de una tarima | `m3` > 2.576 (R-09) |
+| 422 | `validacion` | El SKU no es válido | SKU con otro formato |
+| 422 | `validacion` | La ilustración no es válida | `ilustracion` fuera de la lista |
 | 422 | `validacion` | El proveedor no existe | `proveedor_id` no existe |
 
 ### Proveedores · `/api/proveedores`
@@ -453,6 +457,8 @@ Oficina. Sin cuerpo. Genera una contraseña temporal nueva y deja `contrasena_te
 |---|---|---|---|
 | 409 | `usuario_duplicado` | Este usuario ya está registrado | Otro usuario tiene el mismo nombre de usuario |
 | 409 | `no_puedes_eliminarte` | No puedes eliminar tu propio usuario | Oficina intenta borrar o desactivar su propio usuario |
+| 409 | `no_puedes_cambiar_tu_rol` | No puedes cambiar tu propio rol | Oficina intenta cambiar el rol de su propio usuario |
+| 422 | `validacion` | El usuario admite de 3 a 40 letras, números, punto, guion o guion bajo | `usuario` con otro formato |
 | 422 | `validacion` | Completa Usuario · Completa Nombre · Completa Rol | Falta un campo obligatorio |
 | 422 | `validacion` | El rol no es válido | `rol` fuera de la lista |
 | 422 | `validacion` | El usuario de Caseta debe empezar con caseta. | Falta el prefijo del rol de Android (igual para `desem.` y `embar.`) |

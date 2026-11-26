@@ -82,7 +82,7 @@ Como usuario de sucursal, proveedor u oficina quiero iniciar sesión en la web p
 
 ### FE-11 · LoginMovil · 5 pts
 Como trabajador del CEDIS quiero iniciar sesión en el teléfono para ver solo los módulos de mi rol.
-- Igual a `LoginMovil/preview.html`: ilustración, campos de 48 px, mostrar contraseña, chip de rol con «CEDIS Veracruz».
+- Igual a `LoginMovil/preview.html`: ilustración, campos de 48 px, mostrar contraseña, chip de rol con «CEDIS CDMX».
 - El chip aparece con los prefijos completos `caseta.`, `desem.`, `embar.` (H-03).
 - Bienvenida con los tres módulos del rol y botón «Salir».
 - «Probar como» solo aparece fuera de producción (N-02).

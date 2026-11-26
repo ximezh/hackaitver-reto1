@@ -30,7 +30,7 @@ describe('FE-11 · LoginMovil', () => {
     useToast().ocultar()
   })
 
-  it('muestra el chip de rol con CEDIS Veracruz solo con los prefijos completos caseta., desem. y embar. (H-03)', async () => {
+  it('muestra el chip de rol con CEDIS CDMX solo con los prefijos completos caseta., desem. y embar. (H-03, AV-DO-009)', async () => {
     expect(detectarRolMovil('cas')).toBeNull()
     expect(detectarRolMovil('des')).toBeNull()
     expect(detectarRolMovil('emb')).toBeNull()
@@ -45,7 +45,7 @@ describe('FE-11 · LoginMovil', () => {
     await wrapper.find('#u').setValue('caseta.jlopez')
     expect(wrapper.find('#role').classes()).toContain('show')
     expect(wrapper.find('#role').text()).toContain('Caseta')
-    expect(wrapper.find('#role').text()).toContain('CEDIS Veracruz')
+    expect(wrapper.find('#role').text()).toContain('CEDIS CDMX')
   })
 
   it('alterna mostrar contraseña y oculta «Probar como» en producción (N-02)', async () => {

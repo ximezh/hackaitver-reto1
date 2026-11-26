@@ -12,6 +12,27 @@ Cada desarrollador trabaja con su agente sobre su propio archivo. Ninguna histor
 
 ---
 
+## Ruta crítica de la entrega (2026-11-25)
+
+Quedan ~45 minutos. Todo lo que no está en esta tabla sale de la entrega y pasa al backlog. **Demo objetivo, en producción:** Oficina entra y administra catálogos → Sucursal arma un pedido → Proveedor agenda su cita sin empalmes.
+
+| Tiempo | Front (Ximena) | Back (Jesus) | DevOps (Luis Daniel) |
+|---|---|---|---|
+| 0–10 min | Cerrar sprint 1 (FE-10…14) y abrir PR a `dev` | Terminar **BE-22** (citas por andén) y abrir PR a `dev` | **DO-20**: servicios y mocks de pedidos, órdenes, disponibilidad y citas en `@/api` |
+| 10–30 min | **FE-22** Agendar cita y, si alcanza, **FE-20** Pedir, contra `@/api` (con mocks si el back no ha entrado) | BE-23 solo si BE-22 ya está en `dev`; si no, corregir lo que reporte front | Merge de PRs en cuanto pasen los checks; probar cada merge en staging |
+| **30 min** | **Congelamiento:** nada nuevo entra a `dev` | **Congelamiento** | **Congelamiento** |
+| 30–40 min | Probar la demo en staging y avisar errores | Corregir solo errores que bloqueen la demo | PR #16 `dev` → `main`; producción se despliega sola (~5 min: CI, publicación y timer) |
+| 40–45 min | — | Semillas de demostración en producción | Verificar producción, credenciales de demo y entregar URL |
+
+**Reglas mientras dure la ruta crítica**
+
+- Un PR por área con lo que esté listo; el merge se hace apenas pasan `ci` y `convenciones`. Sin rediseños ni refactors.
+- Si algo no queda a tiempo, se entrega con mocks (`VITE_API_MOCK`) antes que romper la demo.
+- Avisos solo en los buzones (`docs/AVISOS-<área>.md`) o en el canal del equipo; nada de issues nuevos.
+- **Fuera de la entrega:** sprints 3 a 5 (caseta, recepción, tarima, embarque, complementos), DO-21…23, DO-30…51, FE-23 en adelante, BE-24 en adelante.
+
+---
+
 ## 1. Regla del prototipo
 
 **El diseño del prototipo no se modifica.** La interfaz debe quedar idéntica a [`design/CEDIS Flow/`](../design/CEDIS%20Flow/): pantallas, textos, colores, tamaños, espacios, íconos, ilustraciones y animaciones.
@@ -30,6 +51,7 @@ Cada desarrollador trabaja con su agente sobre su propio archivo. Ninguna histor
 | 2026-11-25 | El calendario de citas muestra de lunes a sábado. | Proveedor · Agendar cita | Luis Daniel |
 | 2026-11-25 | «+ Bulto» abre un formulario con los mismos atributos del producto (producto, SKU, piezas, peso y volumen). | Proveedor · Factura y bultos | Luis Daniel |
 | 2026-11-25 | Pantallas nuevas: perfil, cambio de contraseña obligatorio, recuperación de contraseña, panel de avisos, resultados de búsqueda y las pestañas inferiores de los roles móviles. | Todas | Luis Daniel |
+| 2026-11-25 | El CEDIS está en la Ciudad de México: el chip del login móvil dice «CEDIS CDMX» en lugar de «CEDIS Veracruz» (issue #13). Las sucursales no cambian. | LoginMovil | Luis Daniel |
 | 2026-11-25 | Capacidades: tortón de 12,000 kg; tarima de 1.12 × 1.15 × 2.00 m (altura máxima 2.00 m en lugar de 1.85 m). Los números de las pantallas cambian en consecuencia. | Tarima3D, Embarque, Elementos | Luis Daniel |
 
 ---
@@ -56,7 +78,7 @@ Digitalizar el flujo del CEDIS **de la orden de compra al embarque**: la sucursa
 - Facturación electrónica (CFDI), timbrado o validación con el SAT. El folio de factura solo se captura.
 - Integración con ERP, básculas o impresoras de etiquetas especiales. Se imprime con la impresora láser del navegador.
 - Envío de correos: la recuperación de contraseña pasa por Oficina (ver P-10).
-- Varios CEDIS: se opera un solo CEDIS (Veracruz).
+- Varios CEDIS: se opera un solo CEDIS, en la Ciudad de México (issue #13).
 - Los tableros de documentación del sistema de diseño (`Flujo`, `Cover`) no son pantallas del producto.
 
 ---
@@ -70,7 +92,7 @@ Digitalizar el flujo del CEDIS **de la orden de compra al embarque**: la sucursa
 | S-03 | Quién es el Product Owner | Ximena, Jesus y Luis Daniel deciden en conjunto. |
 | S-04 | Usuarios de GitHub de cada integrante | Se necesitan para `CODEOWNERS` y revisiones (DO-02). |
 | S-05 | Cuenta de AWS, región y dominio | Los aporta Luis Daniel antes de DO-12. |
-| S-06 | Zona horaria de la operación | `America/Mexico_City` (CEDIS Veracruz). |
+| S-06 | Zona horaria de la operación | `America/Mexico_City` (CEDIS en CDMX, issue #13). |
 
 ---
 

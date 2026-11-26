@@ -124,7 +124,7 @@ function salir() {
             <Icono :nombre="rolDetectado.i" :tamano="14" :grosor="2" />
             {{ rolDetectado.n }}
           </span>
-          <span class="t-cap">CEDIS Veracruz</span>
+          <span class="t-cap">CEDIS CDMX</span>
         </template>
       </div>
 
