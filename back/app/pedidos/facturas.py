@@ -7,7 +7,7 @@
 from decimal import Decimal
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, Response
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 from sqlalchemy import Select, select
 from sqlalchemy.orm import Session, selectinload
@@ -15,7 +15,8 @@ from sqlalchemy.orm import Session, selectinload
 from app.auth.dependencias import SesionDb, requiere_rol
 from app.catalogos.comun import Lista, falla
 from app.catalogos.productos import KG_MAXIMO, M3_MAXIMO
-from app.errores import NO_ENCONTRADO, error, validacion
+from app.errores import NO_ENCONTRADO, ErrorApi, error, validacion
+from app.etiquetas import Etiqueta, etiqueta_pdf, etiquetas_pdf, qr_svg
 from app.folios import folio_bulto
 from app.models import Bulto, Factura, LineaOc, OrdenCompra, ParteOc, Usuario
 from app.models.comun import Rol
@@ -301,3 +302,43 @@ def quitar_bulto(folio: str, usuario: Proveedor, session: SesionDb) -> dict:
     session.delete(bulto_de(session, usuario, folio))
     session.commit()
     return {"resultado": "eliminado"}
+
+
+# --- BE-24 · Etiquetas QR ---------------------------------------------------------------
+
+
+def etiqueta_de(bulto: Bulto) -> Etiqueta:
+    oc = bulto.factura.parte.oc
+    return Etiqueta(
+        bulto=bulto.folio,
+        oc=oc.folio,
+        sucursal=f"Suc. {oc.sucursal.clave}",
+        sku=bulto.producto.sku,
+        piezas=bulto.piezas,
+        qr=qr_texto(bulto),
+    )
+
+
+def _archivo(contenido: bytes, tipo: str, nombre: str | None = None) -> Response:
+    encabezados = {"Content-Disposition": f'attachment; filename="{nombre}"'} if nombre else None
+    return Response(contenido, media_type=tipo, headers=encabezados)
+
+
+@bultos_router.get("/{folio}/qr.svg", response_class=Response)
+def qr_del_bulto(folio: str, usuario: ProveedorUOficina, session: SesionDb) -> Response:
+    return _archivo(qr_svg(qr_texto(bulto_de(session, usuario, folio))), "image/svg+xml")
+
+
+@bultos_router.get("/{folio}/etiqueta.pdf", response_class=Response)
+def etiqueta_del_bulto(folio: str, usuario: ProveedorUOficina, session: SesionDb) -> Response:
+    bulto = bulto_de(session, usuario, folio)
+    return _archivo(etiqueta_pdf(etiqueta_de(bulto)), "application/pdf", f"{bulto.folio}.pdf")
+
+
+@router.get("/{folio}/etiquetas.pdf", response_class=Response)
+def etiquetas_de_la_factura(folio: str, usuario: ProveedorUOficina, session: SesionDb) -> Response:
+    factura = factura_de(session, usuario, folio)
+    if not factura.bultos:
+        raise ErrorApi(409, "factura_sin_bultos", "Agrega bultos para imprimir sus etiquetas")
+    contenido = etiquetas_pdf([etiqueta_de(b) for b in factura.bultos])
+    return _archivo(contenido, "application/pdf", f"{factura.folio}-etiquetas.pdf")
