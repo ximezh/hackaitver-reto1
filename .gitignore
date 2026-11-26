@@ -3,6 +3,7 @@
 .env.*
 !.env.example
 infra/entornos/*.env
+infra/entornos/demo-*.txt
 *.pem
 *.key
 
