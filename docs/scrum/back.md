@@ -257,8 +257,8 @@ Como usuario quiero recibir avisos de lo que pasa con mis entregas, pedidos y an
 
 | Sprint | Estado | PR |
 |---|---|---|
-| 0 | Pendiente | — |
-| 1 | Pendiente | — |
+| 0 | Hecho | #6 |
+| 1 | En curso | — |
 | 2 | Pendiente | — |
 | 3 | Pendiente | — |
 | 4 | Pendiente | — |
