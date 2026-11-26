@@ -122,10 +122,13 @@ export function configurarGuardas(instanciaRouter) {
       return esMovil ? '/movil/login' : '/login'
     }
 
-    const inicioRol = obtenerRutaInicioRol(sesion.rol)
+    // Abrir un login con sesión activa la cierra: así se puede cambiar de usuario.
     if (to.meta?.publica) {
-      return inicioRol
+      sesion.salir()
+      return true
     }
+
+    const inicioRol = obtenerRutaInicioRol(sesion.rol)
 
     const canalEsperado = esMovil ? 'android' : 'web'
     if (sesion.canal && sesion.canal !== canalEsperado) {
