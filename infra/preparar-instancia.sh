@@ -21,7 +21,8 @@ COMPOSE_VERSION=v2.39.4
 CADDYFILE=/etc/caddy/Caddyfile
 
 paso() { echo "==> $*"; }
-como_cedis() { sudo -iu "$USUARIO" env XDG_RUNTIME_DIR="/run/user/$(id -u "$USUARIO")" bash -c "$1"; }
+# El bloque va por la entrada estándar: `sudo -i … -c` aplana los saltos de línea.
+como_cedis() { printf '%s\n' "$1" | sudo -iu "$USUARIO" env XDG_RUNTIME_DIR="/run/user/$(id -u "$USUARIO")" bash -s; }
 
 paso "Paquetes"
 faltan=()

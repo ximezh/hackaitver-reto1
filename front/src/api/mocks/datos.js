@@ -1,3 +1,5 @@
+import { crearDatosPedidos } from './datosPedidos.js'
+
 /**
  * Datos de los mocks: los ejemplos del contrato del sprint 1 (docs/api/sprint-1.md), que son
  * los del prototipo. Viven en memoria; recargar la página los regresa a este estado.
@@ -98,6 +100,7 @@ function crear() {
       contrasena_temporal: u.id in TEMPORALES,
       contrasena: TEMPORALES[u.id] ?? CONTRASENA_DEMO,
     })),
+    ...crearDatosPedidos(),
   }
 }
 
@@ -108,5 +111,8 @@ export const usuarios = db.usuarios
 /** Regresa los datos al estado inicial. Lo usan las pruebas. */
 export function reiniciarDatos() {
   const nuevo = crear()
-  for (const tabla of Object.keys(db)) db[tabla].splice(0, db[tabla].length, ...nuevo[tabla])
+  for (const [clave, valor] of Object.entries(nuevo)) {
+    if (Array.isArray(valor)) db[clave].splice(0, db[clave].length, ...valor)
+    else db[clave] = valor
+  }
 }

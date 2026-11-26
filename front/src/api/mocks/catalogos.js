@@ -51,9 +51,16 @@ function registrarCrud({ ruta, tabla, reglas, preparar, publico, unico, despues,
   const formato = publico ?? ((x) => x)
 
   registrarMock('get', ruta, ({ headers, query }) => {
-    soloOficina(headers)
+    // Sprint 2: Sucursal también lista productos, solo los activos.
+    const sesion = usuarioDeSesion(headers)
+    const sucursalVeProductos = tabla === 'productos' && sesion.rol === 'sucursal'
+    if (!sucursalVeProductos) soloOficina(headers)
     const q = SIN_ACENTOS(query.q)
-    const items = db[tabla].filter((x) => !q || SIN_ACENTOS(Object.values(x).join(' ')).includes(q))
+    const items = db[tabla].filter(
+      (x) =>
+        (!sucursalVeProductos || x.estado === 'activo') &&
+        (!q || SIN_ACENTOS(Object.values(x).join(' ')).includes(q)),
+    )
     return { items: items.map(formato), total: items.length }
   })
 
