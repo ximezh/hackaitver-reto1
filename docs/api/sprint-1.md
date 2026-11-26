@@ -457,6 +457,8 @@ Oficina. Sin cuerpo. Genera una contraseña temporal nueva y deja `contrasena_te
 |---|---|---|---|
 | 409 | `usuario_duplicado` | Este usuario ya está registrado | Otro usuario tiene el mismo nombre de usuario |
 | 409 | `no_puedes_eliminarte` | No puedes eliminar tu propio usuario | Oficina intenta borrar o desactivar su propio usuario |
+| 409 | `no_puedes_cambiar_tu_rol` | No puedes cambiar tu propio rol | Oficina intenta cambiar el rol de su propio usuario |
+| 422 | `validacion` | El usuario admite de 3 a 40 letras, números, punto, guion o guion bajo | `usuario` con otro formato |
 | 422 | `validacion` | Completa Usuario · Completa Nombre · Completa Rol | Falta un campo obligatorio |
 | 422 | `validacion` | El rol no es válido | `rol` fuera de la lista |
 | 422 | `validacion` | El usuario de Caseta debe empezar con caseta. | Falta el prefijo del rol de Android (igual para `desem.` y `embar.`) |
