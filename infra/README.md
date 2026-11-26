@@ -48,11 +48,21 @@ cd ~/reto1/infra
 cp entornos/borde.env.example entornos/borde.env            # DOMINIO
 cp entornos/produccion.env.example entornos/produccion.env  # contraseñas largas y dominio
 cp entornos/staging.env.example entornos/staging.env
+python3 -c "import secrets; print(secrets.token_urlsafe(48))"  # un JWT_SECRET distinto por entorno
 chmod 600 entornos/*.env
 podman compose -f compose.borde.yaml --env-file entornos/borde.env up -d
 ```
 
 Los entornos los levanta el despliegue continuo.
+
+**Datos de demostración en staging.** Staging corre con `APP_ENV=production`, así que las semillas (BE-03) solo cargan con una bandera explícita (issue #5). Una vez desplegado:
+
+```bash
+cd ~/reto1/infra
+podman compose -p reto1-staging run --rm back python -m app.seeds --permitir-produccion
+```
+
+En producción no se cargan semillas.
 
 ## Despliegue continuo
 
