@@ -1,0 +1,87 @@
+# Back · CEDIS Flow
+
+API en FastAPI sobre PostgreSQL 17. Plan del área: [docs/scrum/back.md](../docs/scrum/back.md). Contratos: [docs/api/](../docs/api/).
+
+## Base de datos
+
+`compose.yaml`, en la raíz, levanta un PostgreSQL 17 con dos bases:
+
+| Base | Uso | Variable |
+|---|---|---|
+| `reto1` | Desarrollo: la API y las semillas | `DATABASE_URL` |
+| `reto1_test` | Solo pytest: se migra al inicio de cada corrida | `TEST_DATABASE_URL` |
+
+Usuario y contraseña `reto1`, puerto `5432`. Se cambian con `POSTGRES_USER`, `POSTGRES_PASSWORD` y `POSTGRES_PORT`.
+
+Por decisión del equipo, el contenedor se maneja con **Podman**.
+
+```bash
+podman machine init      # solo la primera vez (Windows y macOS)
+podman machine start
+podman compose up -d
+```
+
+`podman compose` necesita un proveedor de compose instalado (`podman-compose` o `docker-compose`) y lo usa por dentro, siempre contra el motor de Podman.
+
+### Comandos útiles
+
+| Tarea | Comando |
+|---|---|
+| Ver si está lista | `podman compose ps` |
+| Abrir `psql` | `podman compose exec db psql -U reto1 reto1` |
+| Detener | `podman compose down` |
+| Borrar los datos | `podman compose down -v` |
+
+### Si ya tenías el volumen antes de `reto1_test`
+
+`back/db/init/` solo corre cuando el volumen está vacío. Si la base se creó antes, crea la de pruebas una vez:
+
+```bash
+podman compose exec db createdb -U reto1 reto1_test
+```
+
+## Puesta en marcha
+
+```bash
+cd back
+cp .env.example .env
+uv sync
+uv run alembic upgrade head
+uv run python -m app.seeds
+uv run fastapi dev app/main.py
+```
+
+## Semillas
+
+`uv run python -m app.seeds` carga los datos de ejemplo del prototipo:
+
+- 7 productos, 4 proveedores y 6 sucursales;
+- 6 usuarios de demostración;
+- los 7 andenes y los 32 racks.
+
+- Es idempotente: solo agrega lo que falta y no sobrescribe lo que Oficina haya editado.
+- Los usuarios de demostración tienen la contraseña `cedis2026` y no tienen que cambiarla al entrar. Para usar otra: `--contrasena <otra>`.
+- Con `APP_ENV=production` no corre, salvo que se agregue `--permitir-produccion`.
+
+| Usuario | Rol | Canal |
+|---|---|---|
+| `caseta.jlopez` | Caseta | Android |
+| `desem.mruiz` | Sup. desembarque | Android |
+| `embar.acruz` | Sup. embarque | Android |
+| `suc07` | Sucursal (Suc. 07 Boca del Río) | Web |
+| `pgolfo` | Proveedor (Papelera del Golfo) | Web |
+| `admin.cedis` | Oficina (Ana Domínguez) | Web |
+
+## Pruebas
+
+```bash
+uv run ruff check . && uv run ruff format --check .
+uv run pytest
+```
+
+- Las pruebas corren contra PostgreSQL real, nunca contra la base de desarrollo.
+- Antes de empezar, `tests/conftest.py`:
+  1. Lee `TEST_DATABASE_URL` del entorno o de `back/.env`. Si falta, o si apunta a la misma base que `DATABASE_URL`, se detiene con un mensaje que dice qué corregir.
+  2. Apunta la app y Alembic a esa base.
+  3. Aplica la última migración (`alembic upgrade head`).
+- Si la base no responde, el mensaje pide levantarla con `podman compose up -d`.
