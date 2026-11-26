@@ -6,11 +6,14 @@ OrdenCompra (OC-26-…) ── sucursal
 """
 
 from datetime import date, datetime
+from decimal import Decimal
 
 from sqlalchemy import (
     CheckConstraint,
     DateTime,
     ForeignKey,
+    ForeignKeyConstraint,
+    Numeric,
     String,
     UniqueConstraint,
     func,
@@ -127,6 +130,9 @@ class Factura(Base):
     productos: Mapped[list["FacturaProducto"]] = relationship(
         back_populates="factura", cascade="all, delete-orphan"
     )
+    bultos: Mapped[list["Bulto"]] = relationship(
+        back_populates="factura", order_by="Bulto.id", cascade="all, delete-orphan"
+    )
 
 
 class FacturaProducto(Base):
@@ -148,3 +154,31 @@ class FacturaProducto(Base):
     producto_id: Mapped[int] = mapped_column(ForeignKey("productos.id"))
 
     factura: Mapped[Factura] = relationship(back_populates="productos")
+
+
+class Bulto(Base):
+    __tablename__ = "bultos"
+    __table_args__ = (
+        CheckConstraint("folio ~ '^B-[0-9]{4,}$'", name="folio_formato"),
+        CheckConstraint("piezas > 0", name="piezas_positivas"),
+        CheckConstraint("kg > 0", name="kg_positivo"),
+        CheckConstraint("m3 > 0", name="m3_positivo"),
+        # Un bulto lleva un solo producto, y debe ser de los de su factura (R-05).
+        ForeignKeyConstraint(
+            ["factura_id", "producto_id"],
+            ["factura_productos.factura_id", "factura_productos.producto_id"],
+            name="fk_bultos_producto_de_la_factura",
+        ),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    folio: Mapped[str] = mapped_column(String(12), unique=True)
+    factura_id: Mapped[int] = mapped_column(ForeignKey("facturas.id"), index=True)
+    producto_id: Mapped[int] = mapped_column(ForeignKey("productos.id"), index=True)
+    piezas: Mapped[int]
+    kg: Mapped[Decimal] = mapped_column(Numeric(7, 1))
+    m3: Mapped[Decimal] = mapped_column(Numeric(6, 3))
+    creado_en: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+    factura: Mapped[Factura] = relationship(back_populates="bultos")
+    producto: Mapped[Producto] = relationship()

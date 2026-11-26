@@ -15,7 +15,7 @@ from sqlalchemy.orm import Session, selectinload
 from app.auth.dependencias import SesionDb, requiere_rol
 from app.catalogos.comun import Lista
 from app.errores import NO_ENCONTRADO, error
-from app.models import LineaOc, OrdenCompra, ParteOc, Usuario
+from app.models import Factura, LineaOc, OrdenCompra, ParteOc, Usuario
 from app.models.comun import Rol
 from app.pedidos.esquemas import M3, Kg, ProductoConMedidas, SucursalResumen, redondear
 from app.tiempo import FechaHora, a_local
@@ -70,9 +70,8 @@ def cita_de_la_parte(parte: ParteOc) -> CitaDeLaParte | None:
     )
 
 
-def bultos_capturados(factura: object) -> int:
-    """Se completa en BE-23, cuando la factura tiene bultos."""
-    return 0
+def bultos_capturados(factura: Factura) -> int:
+    return len(factura.bultos)
 
 
 def factura_de_la_parte(parte: ParteOc) -> FacturaDeLaParte | None:
@@ -118,7 +117,7 @@ def partes_del_proveedor(session: Session, proveedor_id: int):
             selectinload(ParteOc.oc).selectinload(OrdenCompra.sucursal),
             selectinload(ParteOc.lineas).selectinload(LineaOc.producto),
             selectinload(ParteOc.cita),
-            selectinload(ParteOc.factura),
+            selectinload(ParteOc.factura).selectinload(Factura.bultos),
         )
     )
 

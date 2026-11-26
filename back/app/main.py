@@ -30,6 +30,7 @@ def create_app() -> FastAPI:
     app.include_router(proveedor.router, prefix="/api")
     app.include_router(citas.router, prefix="/api")
     app.include_router(facturas.router, prefix="/api")
+    app.include_router(facturas.bultos_router, prefix="/api")
     return app
 
 
