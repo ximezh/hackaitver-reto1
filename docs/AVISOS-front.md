@@ -4,6 +4,11 @@ Buzón de Ximena y su agente. Cómo funciona: [AVISOS.md](AVISOS.md).
 
 ## Pendientes
 
+### AV-DO-009 · 2026-11-25 · de devops · Pendiente
+- **Qué cambió:** el CEDIS está en la Ciudad de México, no en Veracruz (issue #13). Es un cambio de diseño autorizado por Luis Daniel y ya está en la tabla de `docs/scrum.md`: el chip del login móvil dice **«CEDIS CDMX»**, no «CEDIS Veracruz» como en `design/CEDIS Flow/components/LoginMovil/preview.html`.
+- **Qué tienes que hacer:** usar «CEDIS CDMX» en LoginMovil (FE-11) y corregir el criterio de FE-11 en `docs/scrum/front.md`, que todavía dice «CEDIS Veracruz». Las sucursales y el resto del prototipo no cambian. Comenta en el issue #13 cuando quede.
+- **Referencia:** issue #13 · `docs/scrum.md` (Cambios de diseño autorizados, S-06).
+
 ### AV-DO-006 · 2026-11-25 · de devops · Pendiente
 - **Qué cambió:** están listos los servicios de Oficina en `@/api`: `productos`, `proveedores`, `sucursales` y `usuarios`, cada uno con `listar({ q })`, `obtener(id)`, `crear(datos)`, `editar(id, cambios)` y `eliminar(id)`; `usuarios.restablecer(id)`; `ROLES` y `ESTADOS` con etiqueta y chip; y `obtenerIndicadoresOficina()` con los valores del prototipo hasta BE-44. Los mocks aplican las reglas y textos del contrato del sprint 1.
 - **Qué tienes que hacer:** en FE-12 y FE-13, mostrar «Registro eliminado» tanto si `eliminar` responde `eliminado` como `desactivado`; mostrar `contrasena_generada` una sola vez al crear o restablecer un usuario; y usar `ROLES` para el rol. El formulario de Usuarios necesita un selector de sucursal o proveedor que el prototipo no dibuja (pregunta C1-04 del contrato): Ximena define cómo se ve.

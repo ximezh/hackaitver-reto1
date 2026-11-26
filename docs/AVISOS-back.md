@@ -4,6 +4,11 @@ Buzón de Jesus y su agente. Cómo funciona: [AVISOS.md](AVISOS.md).
 
 ## Pendientes
 
+### AV-DO-009 · 2026-11-25 · de devops · Pendiente
+- **Qué cambió:** el CEDIS está en la Ciudad de México, no en Veracruz (issue #13). `docs/scrum.md` ya lo dice en el alcance y en S-06.
+- **Qué tienes que hacer:** si algún texto, semilla, contrato o mensaje nombra la ubicación del CEDIS, cambiarlo a CDMX. La zona horaria `America/Mexico_City` sigue igual y las sucursales de ejemplo no cambian. Comenta en el issue #13 si tuviste que cambiar algo.
+- **Referencia:** issue #13.
+
 ### AV-DO-008 · 2026-11-25 · de devops · Pendiente
 - **Qué cambió:** hay una prueba de contrato del sprint 1 contra el back real: salud, credenciales inválidas, canal incorrecto, login de Oficina, perfil, los cuatro catálogos, `403 sin_permiso` y `401 no_autenticado`. Hoy, contra `dev`, solo pasa la salud: las rutas de BE-10 a BE-14 responden `404 no_encontrado`.
 - **Qué tienes que hacer:** cuando tengas BE-10 a BE-14, levanta el back con las semillas y corre desde `front/`: `API_REAL=http://localhost:8000 npx vitest run src/api/__tests__/contrato.real.spec.js`. Si algo no coincide con el contrato, avísalo aquí o en `AVISOS-devops.md`.

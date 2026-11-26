@@ -30,6 +30,7 @@ Cada desarrollador trabaja con su agente sobre su propio archivo. Ninguna histor
 | 2026-11-25 | El calendario de citas muestra de lunes a sábado. | Proveedor · Agendar cita | Luis Daniel |
 | 2026-11-25 | «+ Bulto» abre un formulario con los mismos atributos del producto (producto, SKU, piezas, peso y volumen). | Proveedor · Factura y bultos | Luis Daniel |
 | 2026-11-25 | Pantallas nuevas: perfil, cambio de contraseña obligatorio, recuperación de contraseña, panel de avisos, resultados de búsqueda y las pestañas inferiores de los roles móviles. | Todas | Luis Daniel |
+| 2026-11-25 | El CEDIS está en la Ciudad de México: el chip del login móvil dice «CEDIS CDMX» en lugar de «CEDIS Veracruz» (issue #13). Las sucursales no cambian. | LoginMovil | Luis Daniel |
 | 2026-11-25 | Capacidades: tortón de 12,000 kg; tarima de 1.12 × 1.15 × 2.00 m (altura máxima 2.00 m en lugar de 1.85 m). Los números de las pantallas cambian en consecuencia. | Tarima3D, Embarque, Elementos | Luis Daniel |
 
 ---
@@ -56,7 +57,7 @@ Digitalizar el flujo del CEDIS **de la orden de compra al embarque**: la sucursa
 - Facturación electrónica (CFDI), timbrado o validación con el SAT. El folio de factura solo se captura.
 - Integración con ERP, básculas o impresoras de etiquetas especiales. Se imprime con la impresora láser del navegador.
 - Envío de correos: la recuperación de contraseña pasa por Oficina (ver P-10).
-- Varios CEDIS: se opera un solo CEDIS (Veracruz).
+- Varios CEDIS: se opera un solo CEDIS, en la Ciudad de México (issue #13).
 - Los tableros de documentación del sistema de diseño (`Flujo`, `Cover`) no son pantallas del producto.
 
 ---
@@ -70,7 +71,7 @@ Digitalizar el flujo del CEDIS **de la orden de compra al embarque**: la sucursa
 | S-03 | Quién es el Product Owner | Ximena, Jesus y Luis Daniel deciden en conjunto. |
 | S-04 | Usuarios de GitHub de cada integrante | Se necesitan para `CODEOWNERS` y revisiones (DO-02). |
 | S-05 | Cuenta de AWS, región y dominio | Los aporta Luis Daniel antes de DO-12. |
-| S-06 | Zona horaria de la operación | `America/Mexico_City` (CEDIS Veracruz). |
+| S-06 | Zona horaria de la operación | `America/Mexico_City` (CEDIS en CDMX, issue #13). |
 
 ---
 
