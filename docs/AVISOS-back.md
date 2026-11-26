@@ -4,6 +4,11 @@ Buzón de Jesus y su agente. Cómo funciona: [AVISOS.md](AVISOS.md).
 
 ## Pendientes
 
+### AV-DO-010 · 2026-11-25 · de devops · Pendiente
+- **Qué cambió:** hay ruta crítica para la entrega (~45 min) al inicio de `docs/scrum.md`. Congelamiento de `dev` a los 30 minutos; después solo se corrigen errores que bloqueen la demo.
+- **Qué tienes que hacer:** seguir tu columna de la tabla; priorizar BE-22 y avisar a DevOps si cambia el contrato del sprint 2.
+- **Referencia:** `docs/scrum.md` · Ruta crítica de la entrega.
+
 Ninguno todavía.
 
 ## Atendidos
