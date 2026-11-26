@@ -25,6 +25,7 @@ jobs:
       front: ${{ steps.filtro.outputs.front }}
       back: ${{ steps.filtro.outputs.back }}
       tools: ${{ steps.filtro.outputs.tools }}
+      github: ${{ steps.filtro.outputs.github }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
@@ -40,6 +41,9 @@ jobs:
             tools:
               - 'tools/**'
               - 'design/**'
+              - '.github/workflows/ci.yml'
+            github:
+              - '.github/scripts/**'
               - '.github/workflows/ci.yml'
 
   front:
@@ -130,16 +134,30 @@ jobs:
         working-directory: tools/prototipo
         run: npm test
 
+  github:
+    name: GitHub · revisor de convenciones
+    needs: cambios
+    if: needs.cambios.outputs.github == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Pruebas
+        working-directory: .github/scripts
+        run: python -m unittest -v test_convenciones.py
+
   ci:
     name: ci
-    needs: [cambios, front, back, tools]
+    needs: [cambios, front, back, tools, github]
     if: always()
     runs-on: ubuntu-latest
     steps:
       - name: Resumen
         run: |
-          echo "front: ${{ needs.front.result }} · back: ${{ needs.back.result }} · tools: ${{ needs.tools.result }}"
-          for resultado in "${{ needs.cambios.result }}" "${{ needs.front.result }}" "${{ needs.back.result }}" "${{ needs.tools.result }}"; do
+          echo "front: ${{ needs.front.result }} · back: ${{ needs.back.result }} · tools: ${{ needs.tools.result }} · github: ${{ needs.github.result }}"
+          for resultado in "${{ needs.cambios.result }}" "${{ needs.front.result }}" "${{ needs.back.result }}" "${{ needs.tools.result }}" "${{ needs.github.result }}"; do
             if [ "$resultado" != "success" ] && [ "$resultado" != "skipped" ]; then
               echo "Un job falló o se canceló: $resultado"
               exit 1
