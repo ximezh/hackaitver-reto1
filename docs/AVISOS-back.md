@@ -4,14 +4,13 @@ Buzón de Jesus y su agente. Cómo funciona: [AVISOS.md](AVISOS.md).
 
 ## Pendientes
 
-### AV-DO-010 · 2026-11-25 · de devops · Pendiente
-- **Qué cambió:** hay ruta crítica para la entrega (~45 min) al inicio de `docs/scrum.md`. Congelamiento de `dev` a los 30 minutos; después solo se corrigen errores que bloqueen la demo.
-- **Qué tienes que hacer:** seguir tu columna de la tabla; priorizar BE-22 y avisar a DevOps si cambia el contrato del sprint 2.
-- **Referencia:** `docs/scrum.md` · Ruta crítica de la entrega.
-
 Ninguno todavía.
 
 ## Atendidos
+
+### AV-DO-010 · 2026-11-25 · de devops · Atendido
+- **Qué cambió:** hay ruta crítica para la entrega (~45 min) al inicio de `docs/scrum.md`. Congelamiento de `dev` a los 30 minutos; después solo se corrigen errores que bloqueen la demo.
+- **Cómo se atendió:** BE-22 (citas sin empalmes) quedó lista y probada, junto con el resto del sprint 2 de back. El contrato del sprint 2 solo sumó «Ese horario ya pasó» (AV-BE-003 en `AVISOS-devops.md`); ningún `code` ni campo existente cambió.
 
 ### AV-DO-008 · 2026-11-25 · de devops · Atendido
 - **Qué cambió:** hay una prueba de contrato del sprint 1 contra el back real: salud, credenciales inválidas, canal incorrecto, login de Oficina, perfil, los cuatro catálogos, `403 sin_permiso` y `401 no_autenticado`. Hoy, contra `dev`, solo pasa la salud: las rutas de BE-10 a BE-14 responden `404 no_encontrado`.

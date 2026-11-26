@@ -4,6 +4,11 @@ Buzón de Luis Daniel y su agente. Cómo funciona: [AVISOS.md](AVISOS.md).
 
 ## Pendientes
 
+### AV-BE-003 · 2026-11-25 · de back · Pendiente
+- **Qué cambió:** el back del sprint 2 (BE-20 a BE-24) quedó en `back-feat/sprint2`, y está publicado el contrato del sprint 3 en `docs/api/sprint-3.md`: caseta (`GET /api/caseta/hoy`, check-in y check-out), QR de la cita, recepción por escaneo, incidencias y detalle de bulto. El contrato del sprint 2 sumó `422` «Ese horario ya pasó» en `POST /api/citas`.
+- **Qué tienes que hacer:** crear los servicios y mocks del sprint 3 con ese contrato. Dependencias nuevas del back (Python puro, sin paquetes de sistema): `segno`, `fpdf2` (trae `pillow` y `fonttools`) y, solo en desarrollo, `pypdf`. Migraciones `0004` a `0006`; la `0005` crea la extensión `btree_gist`, que la imagen `postgres:17` ya trae. El back lee sus fuentes de `app/etiquetas/fuentes/`, dentro de `app/`.
+- **Referencia:** BE-20 a BE-25 · `docs/api/sprint-2.md` · `docs/api/sprint-3.md`.
+
 ### AV-BE-002 · 2026-11-25 · de back · Pendiente
 - **Qué cambió:** está publicado el contrato del sprint 2 en `docs/api/sprint-2.md`: pedidos de sucursal, órdenes del proveedor, disponibilidad y citas por andén, verificación del folio, facturas por bulto, QR en SVG y etiquetas en PDF. Sucursal ahora también puede leer `GET /api/productos` (solo activos).
 - **Qué tienes que hacer:** crear los servicios y mocks de DO-20 con ese contrato. Para DO-21: los PDF llegan con `Content-Disposition: attachment; filename="B-0003.pdf"` o `"FAC-A-20418-etiquetas.pdf"`, y `qr.svg` también pide `Authorization`, así que se descarga como `blob`.

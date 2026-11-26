@@ -110,6 +110,14 @@ RESTRICCIONES: dict[str, Restriccion] = {
     "ck_usuarios_prefijo_de_rol": _formato(
         "El prefijo del usuario no corresponde a su rol", "usuario"
     ),
+    # Sprint 2: citas y facturas. Se revisan antes en el servicio; la base es la última
+    # palabra cuando dos proveedores confirman al mismo tiempo (A-08).
+    "ex_citas_sin_empalme": Restriccion(409, "anden_ocupado", "Ese andén ya está ocupado", "anden"),
+    "uq_factura_productos_folio_producto_id": Restriccion(
+        409, "folio_registrado", "Este folio ya está registrado", "folio_factura"
+    ),
+    "uq_citas_parte_id": Restriccion(409, "cita_existente", "Esta orden ya tiene cita"),
+    "uq_facturas_parte_id": Restriccion(409, "cita_existente", "Esta orden ya tiene cita"),
 }
 
 CONFLICTO = (409, "conflicto", "No se pudo guardar porque choca con otro registro")

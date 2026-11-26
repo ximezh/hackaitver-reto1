@@ -299,6 +299,7 @@ Proveedor.
 | 422 | `validacion` | Elige un andén de recibo, de R1 a R4 | `anden` no es de recibo |
 | 422 | `validacion` | Elige un horario de 8:00 a 18:00 en bloques de 30 minutos | `inicio` fuera del horario o sin bloque de 30 min |
 | 422 | `validacion` | La cita debe terminar a más tardar a las 18:00 | `inicio` + `duracion_min` > 18:00 |
+| 422 | `validacion` | Ese horario ya pasó | `dia` es hoy y `inicio` ya pasó |
 | 422 | `validacion` | Elige una duración de 1, 1.5, 2 o 3 h | `duracion_min` fuera de la lista |
 | 422 | `validacion` | Errores de `dia` | Ver la tabla de disponibilidad |
 
